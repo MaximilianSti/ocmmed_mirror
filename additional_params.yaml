@@ -1,0 +1,22 @@
+
+### This file contains parameters which can be modified if needed
+
+model_params:
+  solver: cplex
+  # must be a supported by cobrapy (currently: either cplex, glpk or gurobi), and must be correctly installed
+  timelimit:
+  # leave empty for no timelimit
+  feasibility: 1e-6
+  mipgaptol: 1e-3
+  verbosity: 1
+
+imat_params:
+  epsilon: 1e-2
+  threshold: 1e-5
+
+enum_params:
+  obj_tol: 1e-3
+
+rxn_enum_params:
+  reaction_list: pilot_data/HumanGEM11_reactions_shuffled.csv
+  num_rxns: 10
