@@ -19,4 +19,9 @@ enum_params:
 
 rxn_enum_params:
   reaction_list: pilot_data/HumanGEM11_reactions_shuffled.csv
-  num_rxns: 10
+  # if left empty, will use the reactions in the order in which they are in the network
+  num_rxns: 3
+
+div_enum_params:
+  dist_anneal: 0.9
+  iterations: 3

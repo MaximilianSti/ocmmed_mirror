@@ -1,14 +1,14 @@
 
 ### the paths will later be given through the command line
 
-modelpath: 'pilot_data/Human-GEM11.xml'
-expressionpath: 'pilot_data/gene_IDs_meanvalues.csv'
+modelpath: pilot_data/Human-GEM11.xml
+expressionpath: pilot_data/gene_IDs_meanvalues.csv
+output_path: pilot_data/
 
-### these parameters are for the model that will be used throughout the pipeline
+### these parameters are for the metabolic model
 
 modelname: human1
-
-output_path: pilot_data/
+# Currently only supports human1, recon1, recon2, iMM1865, zebrafish1
 
 ### these parameters are for the gene expression file
 
@@ -25,3 +25,23 @@ gpr_parameters:
   percentile: 0.25
   # the percentile cutoff for low/high gene expression
   # with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
+
+
+### these parameters are for the network enumeration
+
+force_active_reactions: true
+# define whether some reactions in the model should be forced to carry flux
+active_reactions: # use the reaction IDs from the model to define the reactions which must carry flux
+#  - MAR13082 # this is the generic biomass reaction for human1
+  - MAR09931 # this is the biomass maintenance reaction with upper bound 0
+
+fluxvalue: 1e-4
+# minimum value that the flux should have.
+
+### these parameters are for the network computation in the final step
+
+final_network: union
+# defines the method used for computing the network at the end of the workflow
+# must be either 'union' or 'minimal'
+# 'union' contains all reactions which are active in at least one DEXOM solution
+# 'minimal' contains only the reactions which are active in every solution + the reactions necessary to make the network flux-consistent

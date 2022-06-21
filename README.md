@@ -17,9 +17,8 @@ The `config.yaml` file contains the main parameters, including the path to the m
 ## Pipeline
 The gene expression data is converted into one set of reaction weights for each experimental condition.  
 These weights are then used to find a context-specific network which fits the transcriptomics.  
-Afterwards, the reaction-enumeration method is applied to obtain multiple solutions
+Afterwards, DEXOM is used to enumerate multiple solutions (reaction-enumeration & diversity-enumeration)
+The DEXOM solutions are merged and used to construct the new metabolic model which is saved as an SBML file.
 
 ## Todo
-diversity-enum for more enumeration solutions
 integrate slurm cluster pipeline?
-merge enumeration solutions into one model, which can be exported as an sbml
