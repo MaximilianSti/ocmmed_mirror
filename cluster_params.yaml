@@ -1,0 +1,20 @@
+
+cluster_files: cluster_files/
+# path where various files from the cluster will be saved
+
+batch_num: 10
+# number of parallel batches
+
+batch_rxn_sols: 10
+# number of reaction-enum solutions per batch
+
+batch_div_sols: 10
+# number of diversity-enum solutions per batch
+
+approach: grouped
+# which parallelization approach to use on the slurm cluster
+# either 'grouped' or 'separate'
+# if 'grouped': within each batch, several reaction-enum and div-enum solutions will be computed,
+#               the solutions will be concatenated at the end
+# if 'separate': reaction-enum solutions will be computed first, then concatenated, and div-enum solutions
+#                will be computed separately
