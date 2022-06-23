@@ -3,7 +3,7 @@
 
 modelpath: pilot_data/Human-GEM11.xml
 expressionpath: pilot_data/gene_IDs_meanvalues.csv
-output_path: pilot_data/
+output_path: pilot_data_results/
 
 ### these parameters are for the metabolic model
 
@@ -14,17 +14,18 @@ modelname: human1
 
 gene_ID_column: gene_IDs
 # name of the column containing gene IDs
-gene_expression_columns: DMSO,BPA
+gene_expression_columns: DMSO, BPA
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
+# if empty, all columns (except the gene_ID_column) will be used
 
 gpr_parameters:
   qualitative: true
   # if true, the gene expression will be converted to reaction weights -1/0/1
   # if false, the expression will directly be mapped to the reactions
-  percentile: 0.25
+  percentile: 0.05
   # the percentile cutoff for low/high gene expression
-  # with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
+  # example: with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
 
 
 ### these parameters are for the network enumeration

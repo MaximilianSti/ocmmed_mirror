@@ -15,13 +15,15 @@ imat_params:
   threshold: 1e-5
 
 enum_params:
-  obj_tol: 1e-3
+  objective_tolerance: 1e-3
 
 rxn_enum_params:
-  reaction_list: pilot_data/HumanGEM11_reactions_shuffled.csv
+  reaction_list: # pilot_data/HumanGEM11_reactions_shuffled.csv
   # if left empty, will use the reactions in the order in which they are in the network
   num_rxns: 3
 
 div_enum_params:
   dist_anneal: 0.9
   iterations: 3
+  icut: true
+  full: false
