@@ -5,6 +5,7 @@ import numpy as np
 import optlang
 from utilities.force import force_active_rxns
 import argparse
+from warnings import warn
 
 
 # read configuration from YAML file
@@ -69,7 +70,7 @@ if __name__ == '__main__':
     try:
         imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'], threshold=ip['threshold'])
     except optlang.exceptions.SolverError:
-        print('Solver could not find a solution with forced active reactions. '
+        warn('Solver could not find a solution with forced active reactions. '
               'Attempting to find a solution without forced flux.')
         imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
                                     threshold=ip['threshold'])

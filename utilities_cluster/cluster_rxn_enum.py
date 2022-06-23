@@ -3,6 +3,7 @@ import ruamel.yaml as yaml
 import pandas as pd
 from utilities.force import force_active_rxns
 import argparse
+from warnings import warn
 
 
 # read configuration from YAML file
@@ -56,6 +57,10 @@ if __name__ == '__main__':
     if rp['reaction_list']:
         df = pd.read_csv(rp['reaction_list'], header=None)
         reactions = [x for x in df.unstack().values]
+        if False in [rid in model.reactions for rid in reactions]:
+            warn('One or more of the reactions in "reaction_list" are not present in the model. '
+                 'The provided reaction list will not be used.')
+            reactions = [r.id for r in model.reactions]
     else:
         reactions = [r.id for r in model.reactions]
 
@@ -75,7 +80,7 @@ if __name__ == '__main__':
     uniques = pd.DataFrame(rxnsol.unique_binary)
     uniques.to_csv(outpath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
 
-    if args.approach == 2:
+    if clus['approach'] == 'grouped':
         for i in range(1, len(rxnsol.unique_solutions)):
             dexom_python.write_solution(model, rxnsol.unique_solutions[i], ip['threshold'], clus['cluster_files']
                                         +'rxn_enum_solution_%s_%s_%i.csv' % (condition, args.parallel_id, i))

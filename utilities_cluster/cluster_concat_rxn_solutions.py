@@ -18,7 +18,7 @@ else:
 
 
 if __name__ == '__main__':
-    description = 'For a given condition calculates reaction weights and computes iMAT solution'
+    description = 'Concatenates all reaction-enumeration solutions'
 
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
@@ -31,4 +31,4 @@ if __name__ == '__main__':
             sol = pd.read_csv(f, index_col=0)
             solutions.append(sol)
         solutions = pd.concat(solutions).drop_duplicates(ignore_index=True)
-        solutions.to_csv(outpath+'all_rxn_enum_solutions_%s.csv' % condition)
+        solutions.to_csv(outpath+'full_rxn_enum_solutions_%s.csv' % condition)

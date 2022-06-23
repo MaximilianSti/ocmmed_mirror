@@ -6,6 +6,7 @@ from cobra.io import write_sbml_model
 import optlang
 from utilities.force import force_active_rxns
 from utilities.minimal import mba
+from warnings import warn
 
 
 # read configuration from YAML file
@@ -72,7 +73,7 @@ if __name__ == '__main__':
         try:
             imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'], threshold=ip['threshold'])
         except optlang.exceptions.SolverError:
-            print('Solver could not find a solution with forced active reactions. '
+            warn('Solver could not find a solution with forced active reactions. '
                   'Attempting to find a solution without forced flux.')
             model = model_keep.copy()
             imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
@@ -88,6 +89,10 @@ if __name__ == '__main__':
         if rp['reaction_list']:
             df = pd.read_csv(rp['reaction_list'], header=None)
             reactions = [x for x in df.unstack().values]
+            if False in [rid in model.reactions for rid in reactions]:
+                warn('One or more of the reactions in "reaction_list" are not present in the model. '
+                     'The provided reaction list will not be used.')
+                reactions = [r.id for r in model.reactions]
             rxnlist = reactions[:rp['num_rxns']]
         else:
             reactions = [r.id for r in model.reactions]
@@ -116,6 +121,6 @@ if __name__ == '__main__':
     elif doc['final_network'] == 'minimal':
         new_model = mba(model_keep=new_model, enum_solutions=dexom_sols, essential_reactions=doc['active_reactions'])
     else:
-        print('Invalid value for "final_network" in config.yaml, returning original network.')
+        warn('Invalid value for "final_network" in config.yaml, returning original network.')
     new_model.id += '_cellspecific'
     write_sbml_model(new_model, outpath+'cellspecific_model.xml')
