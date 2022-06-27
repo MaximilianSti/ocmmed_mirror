@@ -40,6 +40,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--condition', help='column of the gene expression file containing the data for one condition')
     parser.add_argument('-d', '--dist_anneal', type=float, default=-1., help='diversity-enum dist_anneal parameter')
     parser.add_argument('-i', '--maxiter', type=int, default=10, help='number of iterations')
+    parser.add_argument('-p', '--parallel_id', type=str, default='', help='id of the parallel thread')
     args = parser.parse_args()
     # read model
     model = dexom_python.read_model(modelpath, solver=mp['solver'])
