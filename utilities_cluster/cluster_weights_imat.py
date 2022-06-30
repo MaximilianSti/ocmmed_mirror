@@ -10,7 +10,7 @@ from warnings import warn
 
 # read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
-with open('../config.yaml', 'r') as file:
+with open('../parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
 

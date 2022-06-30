@@ -1,14 +1,9 @@
 
-### the paths will later be given through the command line
+### these are the filepaths used throughout the
 
 modelpath: pilot_data/Human-GEM11.xml
 expressionpath: pilot_data/gene_IDs_meanvalues.csv
 output_path: pilot_data_results/
-
-### these parameters are for the metabolic model
-
-modelname: human1
-# Currently only supports human1, recon1, recon2, iMM1865, zebrafish1
 
 ### these parameters are for the gene expression file
 
@@ -18,6 +13,10 @@ gene_expression_columns: DMSO, BPA
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
 # if empty, all columns (except the gene_ID_column) will be used
+
+duplicates: remove
+# how to deal with genes for which several values are present in the expression file, in case these values have conflicting information
+# possible methods: "remove", "min", "max", "mean", "median"
 
 gpr_parameters:
   qualitative: true

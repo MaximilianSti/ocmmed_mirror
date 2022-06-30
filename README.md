@@ -3,12 +3,8 @@ Obtaining cell-specific metabolic models through enumeration with DEXOM
 
 ## Requirements
 - Python 3.7+
-- dexom-python
 - cplex 12.10+
-
-Install dexom-python with:
-
-`pip install dexom-python`
+- python packages in the `requirements.txt` file
 
 ## Inputs
 The `config.yaml` file contains the main parameters, including the path to the metabolic model and the path to the gene expression file  
@@ -25,4 +21,5 @@ Because the enumeration of multiple solutions with DEXOM can be very slow when u
 Parameters for the cluster pipeline can be found in `cluster_params.yaml`  
 
 ## Todo
+finish cluster scripts
 write documentation for cluster pipeline

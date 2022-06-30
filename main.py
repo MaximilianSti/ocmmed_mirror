@@ -11,7 +11,7 @@ from warnings import warn
 
 # read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
-with open('config.yaml', 'r') as file:
+with open('parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
 
@@ -93,10 +93,10 @@ if __name__ == '__main__':
                 warn('One or more of the reactions in "reaction_list" are not present in the model. '
                      'The provided reaction list will not be used.')
                 reactions = [r.id for r in model.reactions]
-            rxnlist = reactions[:rp['num_rxns']]
+            rxnlist = reactions[:doc['rxn_enum_iterations']]
         else:
             reactions = [r.id for r in model.reactions]
-            rxnlist = reactions[:rp['num_rxns']]
+            rxnlist = reactions[:doc['rxn_enum_iterations']]
         rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxnlist,
                                                       obj_tol=ep['objective_tolerance'], thr=ip['threshold'])
         uniques = pd.DataFrame(rxnsol.unique_binary)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         print('performing diversity-enumeration for condition ' + condition)
         divsol, divres = dexom_python.enum_functions.diversity_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
                                 dist_anneal=dp['dist_anneal'],eps=ip['epsilon'], thr=ip['threshold'], icut=dp['icut'],
-                                maxiter=dp['iterations'], obj_tol=ep['objective_tolerance'],  full=dp['full'])
+                                maxiter=doc['div_enum_iterations'], obj_tol=ep['objective_tolerance'],  full=dp['full'])
         divs = pd.DataFrame(divsol.binary)
         divs.to_csv(outpath+'div_enum_solutions_%s.csv' % condition)
         dexomsol = pd.concat([uniques, divs])
@@ -121,6 +121,6 @@ if __name__ == '__main__':
     elif doc['final_network'] == 'minimal':
         new_model = mba(model_keep=new_model, enum_solutions=dexom_sols, essential_reactions=doc['active_reactions'])
     else:
-        warn('Invalid value for "final_network" in config.yaml, returning original network.')
+        warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     new_model.id += '_cellspecific'
     write_sbml_model(new_model, outpath+'cellspecific_model.xml')

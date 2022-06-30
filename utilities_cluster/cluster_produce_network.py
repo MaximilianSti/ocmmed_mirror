@@ -10,7 +10,7 @@ from cobra.io import write_sbml_model
 
 # read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
-with open('config.yaml', 'r') as file:
+with open('parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
 
@@ -52,6 +52,6 @@ if __name__ == '__main__':
     elif doc['final_network'] == 'minimal':
         model = mba(model_keep=model, enum_solutions=dex, essential_reactions=doc['active_reactions'])
     else:
-        warn('Invalid value for "final_network" in config.yaml, returning original network.')
+        warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     model.id += '_cellspecific'
     write_sbml_model(model, outpath+'cellspecific_model.xml')
