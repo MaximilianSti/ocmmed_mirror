@@ -1,7 +1,7 @@
 import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
-from utilities.force import force_active_rxns
+from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 
@@ -50,6 +50,8 @@ if __name__ == '__main__':
 
     if doc['force_active_reactions']:
         force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
+    if doc['force_flux_bounds']:
+        force_reaction_bounds(model, doc['force_flux_bounds'])
 
     rw = dexom_python.load_reaction_weights(filename=outpath+'reaction_weights_%s' % condition)
     imatsol, imatbin = dexom_python.read_solution(filename=outpath+'imat_solution_%s.csv' % condition)

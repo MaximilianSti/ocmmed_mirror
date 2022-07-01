@@ -1,9 +1,8 @@
 import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
-import numpy as np
 import optlang
-from utilities.force import force_active_rxns
+from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 
@@ -54,12 +53,8 @@ if __name__ == '__main__':
     # create reaction weights from gene expression
     print('computing reaction weights for condition '+condition)
     gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)
-    for x in set(gene_weights.index):
-        if type(gene_weights[x]) != np.float64:
-            if len(gene_weights[x].value_counts()) > 1:
-                gene_weights.pop(x)
-    gene_weights = gene_weights.to_dict()
-    rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, modelname=doc['modelname'], save=True,
+
+    rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
                                 filename=outpath+'reaction_weights_%s' % condition)
 
     # compute imat solution from reaction weights
@@ -67,6 +62,8 @@ if __name__ == '__main__':
 
     if doc['force_active_reactions']:
         force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
+    if doc['force_flux_bounds']:
+        force_reaction_bounds(model, doc['force_flux_bounds'])
     try:
         imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'], threshold=ip['threshold'])
     except optlang.exceptions.SolverError:

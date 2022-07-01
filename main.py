@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from cobra.io import write_sbml_model
 import optlang
-from utilities.force import force_active_rxns
+from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.minimal import mba
 from warnings import warn
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                 if len(gene_weights[x].value_counts()) > 1:
                     gene_weights.pop(x)
         gene_weights = gene_weights.to_dict()
-        rw = dexom_python.apply_gpr(model=model_keep, gene_weights=gene_weights, modelname=doc['modelname'], save=True,
+        rw = dexom_python.apply_gpr(model=model_keep, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
                                     filename=outpath+'reaction_weights_%s' % condition)
 
         # compute imat solution from reaction weights
@@ -70,6 +70,8 @@ if __name__ == '__main__':
         model = model_keep.copy()
         if doc['force_active_reactions']:
             force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
+        if doc['force_flux_bounds']:
+            force_reaction_bounds(model, doc['force_flux_bounds'])
         try:
             imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'], threshold=ip['threshold'])
         except optlang.exceptions.SolverError:

@@ -37,6 +37,11 @@ active_reactions: # use the reaction IDs from the model to define the reactions 
 fluxvalue: 1e-4
 # minimum value that the flux should have.
 
+force_flux_bounds:
+  MAR03905: 0,1000
+# manually define the lower and upper flux bounds for some reactions
+
+
 rxn_enum_iterations: 3
 div_enum_iterations: 3
 # number of iterations for reaction-enum and diversity-enum (if using the main.py script)

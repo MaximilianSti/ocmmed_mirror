@@ -3,7 +3,6 @@
 def force_active_rxns(model, rxnlist, fluxvalue=0.1):
     for rid in rxnlist:
         reaction = model.reactions.get_by_id(rid)
-
         if reaction.lower_bound == 0 and reaction.upper_bound > 0:
             reaction.lower_bound = fluxvalue
         elif reaction.lower_bound < 0 and reaction.upper_bound == 0:
@@ -27,3 +26,10 @@ def force_active_rxns(model, rxnlist, fluxvalue=0.1):
             reaction.upper_bound = 1000.
             reaction.lower_bound = fluxvalue
             print("reaction %s is blocked in this model, upper bound was set to 1000" % rid)
+
+
+def force_reaction_bounds(model, rxndict):
+    for rid in rxndict.keys():
+        reaction = model.reactions.get_by_id(rid)
+        bounds = [float(x.strip()) for x in rxndict[rid].split(',')]
+        reaction.bounds = bounds
