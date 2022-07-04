@@ -115,10 +115,12 @@ if __name__ == '__main__':
     dexom_sols = pd.concat(dexom_sols).drop_duplicates(ignore_index=True)
     dexom_sols.to_csv(outpath + 'dexom_solutions.csv')
     dexom_sols.columns = [r.id for r in model_keep.reactions]
+    frequencies = dexom_sols.sum()
+    frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
 
     print('producing final network')
     if doc['final_network'] == 'union':
-        rem_rxns = dexom_sols.columns[dexom_sols.sum() == 0].to_list()  # remove reactions which are active in zero solutions
+        rem_rxns = dexom_sols.columns[frequencies == 0].to_list()  # remove reactions which are active in zero solutions
         new_model.remove_reactions(rem_rxns, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
         new_model = mba(model_keep=new_model, enum_solutions=dexom_sols, essential_reactions=doc['active_reactions'])

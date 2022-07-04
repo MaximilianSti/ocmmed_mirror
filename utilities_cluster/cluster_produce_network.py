@@ -45,9 +45,11 @@ if __name__ == '__main__':
 
     model = dexom_python.read_model(doc['modelpath'])
     dex.columns = [r.id for r in model.reactions]
+    frequencies = dex.sum()
+    frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
 
     if doc['final_network'] == 'union':
-        rem_rxns = dex.columns[dex.sum() == 0].to_list()  # remove reactions which are active in zero solutions
+        rem_rxns = dex.columns[frequencies == 0].to_list()  # remove reactions which are active in zero solutions
         model.remove_reactions(rem_rxns, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
         model = mba(model_keep=model, enum_solutions=dex, essential_reactions=doc['active_reactions'])
