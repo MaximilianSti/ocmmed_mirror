@@ -1,7 +1,6 @@
 import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
-import numpy as np
 from cobra.io import write_sbml_model
 import optlang
 from utilities.force import force_active_rxns, force_reaction_bounds
@@ -47,7 +46,7 @@ if __name__ == '__main__':
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:
         gene_conditions = genes.columns.to_list()
-    if doc['gpr_parameters']['qualitative']:
+    if doc['gpr_parameters']['qualitative'] and not doc['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=gene_conditions,
                                                     proportion=doc['gpr_parameters']['percentile'],
                                                     outpath=outpath+'geneweights_qualitative')
@@ -57,13 +56,15 @@ if __name__ == '__main__':
         # create reaction weights from gene expression
         print('computing reaction weights for condition '+condition)
         gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)
-        for x in set(gene_weights.index):
-            if type(gene_weights[x]) != np.float64:
-                if len(gene_weights[x].value_counts()) > 1:
-                    gene_weights.pop(x)
-        gene_weights = gene_weights.to_dict()
-        rw = dexom_python.apply_gpr(model=model_keep, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
-                                    filename=outpath+'reaction_weights_%s' % condition)
+
+        if doc['reaction_scores']:
+            rw = {}
+            for rxn in model_keep.reactions:
+                rw[rxn.id] = float(gene_weights.to_dict().get(rxn.id, 0.))
+            dexom_python.save_reaction_weights(rw, outpath+'reaction_weights_%s' % condition)
+        else:
+            rw = dexom_python.apply_gpr(model=model_keep, gene_weights=gene_weights, duplicates=doc['duplicates'],
+                                        save=True, filename=outpath+'reaction_weights_%s' % condition)
 
         # compute imat solution from reaction weights
         print('performing iMAT for condition ' + condition)

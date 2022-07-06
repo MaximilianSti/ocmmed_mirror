@@ -3,13 +3,13 @@
 
 modelpath: pilot_data/Human-GEM11.xml
 expressionpath: pilot_data/gene_IDs_meanvalues.csv
-output_path: pilot_data_results/
+output_path: pilot_data_results_cluster/
 
 ### these parameters are for the gene expression file
 
 gene_ID_column: gene_IDs
 # name of the column containing gene IDs
-gene_expression_columns: DMSO, BPA
+gene_expression_columns: DMSO,BPA
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
 # if empty, all columns (except the gene_ID_column) will be used
@@ -26,6 +26,9 @@ gpr_parameters:
   # the percentile cutoff for low/high gene expression
   # example: with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
 
+reaction_scores: false
+# set this to true if the "gene expression file" already contains reaction identifiers instead of gene identifiers.
+# If true, the conversion of gene expression to reaction weights will be skipped, and the provided scores will be mapped directly on the reactions.
 
 ### these parameters are for the network enumeration
 
