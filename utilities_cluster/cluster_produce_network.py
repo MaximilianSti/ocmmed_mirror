@@ -14,11 +14,19 @@ with open('parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
 
+with open('cluster_params.yaml', 'r') as file:
+    c = file.read()
+clus = yaml_reader.load(c)
 
 if doc['output_path']:
     outpath = doc['output_path']
 else:
     outpath = ''
+
+if clus['cluster_files']:
+    cluspath = clus['cluster_files']
+else:
+    cluspath = outpath
 
 
 if __name__ == '__main__':
@@ -27,17 +35,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
-    gene_conditions = doc['gene_expression_columns'].split(',')
+    gene_conditions = [c.strip() for c in doc['gene_expression_columns'].split(',')]
     all_sols = []
     for condition in gene_conditions:
         solutions = []
-        solfiles = Path(outpath).glob('div_enum_solutions_%s_*.csv' % condition)
+        solfiles = Path(cluspath).glob('div_enum_solutions_%s_*.csv' % condition)
+        print("vienumfiles:", solfiles)
         for f in solfiles:
             sol = pd.read_csv(f, index_col=0)
             solutions.append(sol)
         divsols = pd.concat(solutions).drop_duplicates(ignore_index=True)
-        divsols.to_csv(outpath + 'full_div_enum_solutions_%s.csv' % condition)
-        rxnsols = pd.read_csv(outpath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
+        divsols.to_csv(cluspath + 'full_div_enum_solutions_%s.csv' % condition)
+        rxnsols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
         dexomsols = pd.concat([divsols, rxnsols]).drop_duplicates(ignore_index=True)
         dexomsols.to_csv(outpath + 'all_DEXOM_solutions_%s.csv' % condition)
         all_sols.append(dexomsols)

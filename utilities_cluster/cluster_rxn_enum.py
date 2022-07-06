@@ -25,6 +25,11 @@ if doc['output_path']:
 else:
     outpath = ''
 
+if clus['cluster_files']:
+    cluspath = clus['cluster_files']
+else:
+    cluspath = outpath
+
 mp = params['model_params']
 ip = params['imat_params']
 ep = params['enum_params']
@@ -53,7 +58,7 @@ if __name__ == '__main__':
     if doc['force_flux_bounds']:
         force_reaction_bounds(model, doc['force_flux_bounds'])
 
-    rw = dexom_python.load_reaction_weights(filename=outpath+'reaction_weights_%s' % condition)
+    rw = dexom_python.load_reaction_weights(filename=outpath+'reaction_weights_%s.csv' % condition)
     imatsol, imatbin = dexom_python.read_solution(filename=outpath+'imat_solution_%s.csv' % condition)
 
     if rp['reaction_list']:
@@ -80,9 +85,9 @@ if __name__ == '__main__':
     rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
                                                   obj_tol=ep['objective_tolerance'], thr=ip['threshold'])
     uniques = pd.DataFrame(rxnsol.unique_binary)
-    uniques.to_csv(outpath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
+    uniques.to_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
 
-    if clus['approach'] == 'grouped':
-        for i in range(1, len(rxnsol.unique_solutions)):
-            dexom_python.write_solution(model, rxnsol.unique_solutions[i], ip['threshold'], clus['cluster_files']
-                                        +'rxn_enum_solution_%s_%s_%i.csv' % (condition, args.parallel_id, i))
+    # if clus['approach'] == 'grouped':
+    #     for i in range(1, len(rxnsol.unique_solutions)):
+    #         dexom_python.write_solution(model, rxnsol.unique_solutions[i], ip['threshold'], clus['cluster_files']
+    #                                     +'rxn_enum_solution_%s_%s_%i.csv' % (condition, args.parallel_id, i))

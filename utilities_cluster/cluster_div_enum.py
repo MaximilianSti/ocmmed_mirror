@@ -24,6 +24,11 @@ if doc['output_path']:
 else:
     outpath = ''
 
+if clus['cluster_files']:
+    cluspath = clus['cluster_files']
+else:
+    cluspath = outpath
+
 mp = params['model_params']
 ip = params['imat_params']
 ep = params['enum_params']
@@ -53,18 +58,18 @@ if __name__ == '__main__':
         force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
     if doc['force_flux_bounds']:
         force_reaction_bounds(model, doc['force_flux_bounds'])
-    rw = dexom_python.load_reaction_weights(filename=outpath + 'reaction_weights_%s' % condition)
+    rw = dexom_python.load_reaction_weights(filename=outpath + 'reaction_weights_%s.csv' % condition)
 
     prevsol, prevbin = dexom_python.read_solution(outpath + 'imat_solution_%s.csv' % condition)
     if clus['approach'] == 'grouped':
         # prevsol, prevbin = dexom_python.read_solution(clus['cluster_files']+'rxn_enum_solution_%s_%s_1.csv' % (condition, args.parallel_id))
-        rxnenum_sols = pd.read_csv(outpath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
+        rxnenum_sols = pd.read_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id), index_col=0)
         rxnenum_sols.columns = prevsol.fluxes.index
-        prevsol.fluxes = rxnenum_sols.iloc[args.parallel_id]
+        prevsol.fluxes = rxnenum_sols.iloc[0]
     elif clus['approach'] == 'separate':
-        rxnenum_sols = pd.read_csv(outpath + 'all_rxn_enum_solutions_%s.csv' % condition, index_col=0)
+        rxnenum_sols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
         rxnenum_sols.columns = prevsol.fluxes.index
-        prevsol.fluxes = rxnenum_sols.iloc[args.parallel_id]
+        prevsol.fluxes = rxnenum_sols.iloc[int(args.parallel_id)]
     else:
         print("could not recognise approach, using iMAT solution as previous solution")
 
@@ -78,5 +83,5 @@ if __name__ == '__main__':
                                 maxiter=args.maxiter, obj_tol=ep['objective_tolerance'], full=dp['full'])
 
     solutions = pd.DataFrame(divsol.binary)
-    solutions.to_csv(outpath + 'div_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
-    divres.to_csv(outpath + 'div_enum_stats_%s_%s.csv' % (condition, args.parallel_id))
+    solutions.to_csv(cluspath + 'div_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
+    divres.to_csv(cluspath + 'div_enum_stats_%s_%s.csv' % (condition, args.parallel_id))

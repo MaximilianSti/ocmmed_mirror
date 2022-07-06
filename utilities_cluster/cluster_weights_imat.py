@@ -9,11 +9,11 @@ from warnings import warn
 
 # read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
-with open('../parameters.yaml', 'r') as file:
+with open('parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
 
-with open('../additional_params.yaml', 'r') as file:
+with open('additional_params.yaml', 'r') as file:
     b = file.read()
 params = yaml_reader.load(b)
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     condition = args.condition
     # read and process gene expression file
     genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
-    if doc['gpr_parameters']['qualitative']:
+    if doc['gpr_parameters']['qualitative'] and not doc['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=[condition],
                                                     proportion=doc['gpr_parameters']['percentile'],
                                                     outpath=outpath+'geneweights_qualitative')
@@ -53,8 +53,13 @@ if __name__ == '__main__':
     # create reaction weights from gene expression
     print('computing reaction weights for condition '+condition)
     gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)
-
-    rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
+    if doc['reaction_scores']:
+        rw = {}
+        for rxn in model.reactions:
+            rw[rxn.id] = float(gene_weights.to_dict().get(rxn.id, 0.))
+        dexom_python.save_reaction_weights(rw, outpath + 'reaction_weights_%s' % condition)
+    else:
+        rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
                                 filename=outpath+'reaction_weights_%s' % condition)
 
     # compute imat solution from reaction weights

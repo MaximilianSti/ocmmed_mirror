@@ -6,13 +6,13 @@ cluster_files: cluster_files/
 batch_num: 10
 # number of parallel batches for each condition
 
-batch_rxn_sols: 10
+batch_rxn_sols: 100
 # number of reaction-enum solutions per batch
 
-batch_div_sols: 10
+batch_div_sols: 100
 # number of diversity-enum solutions per batch
 
-approach: grouped
+approach: separate
 # which parallelization approach to use on the slurm cluster
 # either 'grouped' or 'separate'
 # if 'grouped': within each batch, several reaction-enum and div-enum solutions will be computed,
