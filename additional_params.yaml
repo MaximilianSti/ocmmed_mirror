@@ -22,16 +22,20 @@ imat_params:
 
 enum_params:
   objective_tolerance: 1e-3
+  # tolerance for the objective function when searching for equally optimal solutions during the enumeration
+  # if you are using discrete weights instead of qualitative weights, increase this parameter up to 1e-2 for faster runtimes
 
 rxn_enum_params:
   reaction_list: # pilot_data/HumanGEM11_reactions_shuffled.csv
-  # if left empty, will use the reactions in the order in which they are in the network
+  # providing a shuffled list of reactions can reduce possible bias in the reaction-enumeration method
+  # if left empty, the reactions will be used in the order in which they are in the network
 
 div_enum_params:
   dist_anneal: 0.9
   # parameter for controlling the distance between each successive diversity-enum solution
+  # This parameter is ignored in the cluster pipeline, as it will be calculated based on the number of batches and iterations
   icut: true
   # if true, will apply integer-cut constraints. This will prevent diversity-enum from finding duplicate solutions
   full: false
-  # if true, will use the full-DEXOM implementation (see dexom_python documentation).
-  # This significantly increases the runtime
+  # if true, will use the full-DEXOM implementation (see dexom-python documentation).
+  # This very significantly increases the computation time per iteration and should only be done on small models

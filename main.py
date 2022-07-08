@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
         # compute imat solution from reaction weights
         print('performing iMAT for condition ' + condition)
-        model = model_keep.copy()
+        model = new_model.copy()
         if doc['force_active_reactions']:
             force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
         if doc['force_flux_bounds']:
@@ -101,12 +101,13 @@ if __name__ == '__main__':
             reactions = [r.id for r in model.reactions]
             rxnlist = reactions[:doc['rxn_enum_iterations']]
         rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxnlist,
-                                                      obj_tol=ep['objective_tolerance'], thr=ip['threshold'])
+                                                      obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
         uniques = pd.DataFrame(rxnsol.unique_binary)
         uniques.to_csv(outpath+'rxn_enum_solutions_%s.csv' % condition)
+        print("length reaction-enumeration solution:", len(uniques))
         print('performing diversity-enumeration for condition ' + condition)
         divsol, divres = dexom_python.enum_functions.diversity_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
-                                dist_anneal=dp['dist_anneal'],eps=ip['epsilon'], thr=ip['threshold'], icut=dp['icut'],
+                                dist_anneal=dp['dist_anneal'], eps=ip['epsilon'], thr=ip['threshold'], icut=dp['icut'],
                                 maxiter=doc['div_enum_iterations'], obj_tol=ep['objective_tolerance'],  full=dp['full'])
         divs = pd.DataFrame(divsol.binary)
         divs.to_csv(outpath+'div_enum_solutions_%s.csv' % condition)
@@ -117,6 +118,7 @@ if __name__ == '__main__':
     dexom_sols.to_csv(outpath + 'dexom_solutions.csv')
     dexom_sols.columns = [r.id for r in model_keep.reactions]
     frequencies = dexom_sols.sum()
+    frequencies.columns = ['frequency']
     frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
 
     print('producing final network')

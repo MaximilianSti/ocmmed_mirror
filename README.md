@@ -9,7 +9,6 @@ Obtaining cell-specific metabolic models through enumeration with DEXOM
 ## Installation
 Refer to installation instructions for dexom-python: https://pypi.org/project/dexom-python/
 
-
 ## Parameters
 The `parameters.yaml` file contains the main parameters, including the path to the metabolic model and the path to the gene expression file  
 `additional_params.yaml` contains more optional parameters
@@ -18,7 +17,6 @@ The `parameters.yaml` file contains the main parameters, including the path to t
 The main inputs are:  
 - a metabolic network in SBML, json or matlab format
 The model is imported using cobrapy.
-
 
 - a csv file containing data which is used for constraining the model.
 The expected default input is preprocessed RNA microarray data (see `pilot_data/gene_expression_meanvalues.csv` for an example of this input).  
@@ -38,6 +36,8 @@ The DEXOM solutions are merged and used to construct the new metabolic model whi
 Because the enumeration of multiple solutions with DEXOM can be very slow when using large metabolic networks and/or large transcriptomic datasets, the pipeline has been adapted for use on a slurm computation cluster.  
 Parameters for the cluster pipeline can be found in `cluster_params.yaml`  
 
+Refer to the [cluster instructions file](cluster_instructions.md) for an explanation fo the cluster pipeline.
+
 ## Todo
-finish cluster scripts  
-write documentation for cluster pipeline
+test cluster pipeline more extensively
+test edge cases

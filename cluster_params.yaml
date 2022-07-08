@@ -5,10 +5,8 @@ cluster_files: cluster_files/
 
 batch_num: 10
 # number of parallel batches for each condition
-
 batch_rxn_sols: 100
 # number of reaction-enum solutions per batch
-
 batch_div_sols: 100
 # number of diversity-enum solutions per batch
 
@@ -20,10 +18,13 @@ approach: separate
 # if 'separate': reaction-enum solutions will be computed first, then concatenated, and div-enum solutions
 #                will be computed separately
 
+emails: true
+# if true, you will receive an email alert everytime a batch starts and ends
+# if false, you will only receive no email alerts
 cores: 24
 # number of cores to assign for each job
 memory: 64
-# allocated memory in G
+# allocated memory per job in gigabytes
 time: 10:00:00
 # maximum allowed runtime per job in hours:minutes:seconds
 pythonpath: system/Python-3.7.4
