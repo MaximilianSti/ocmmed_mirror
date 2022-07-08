@@ -40,7 +40,6 @@ if __name__ == '__main__':
     for condition in gene_conditions:
         solutions = []
         solfiles = Path(cluspath).glob('div_enum_solutions_%s_*.csv' % condition)
-        print("vienumfiles:", solfiles)
         for f in solfiles:
             sol = pd.read_csv(f, index_col=0)
             solutions.append(sol)
@@ -55,6 +54,7 @@ if __name__ == '__main__':
     model = dexom_python.read_model(doc['modelpath'])
     dex.columns = [r.id for r in model.reactions]
     frequencies = dex.sum()
+    frequencies.columns = ['frequency']
     frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
 
     if doc['final_network'] == 'union':

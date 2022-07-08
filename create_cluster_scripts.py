@@ -27,6 +27,11 @@ if clus['cluster_files']:
 else:
     cluspath = ''
 
+if clus['emails']:
+    mail = 'ALL'
+else:
+    mail = 'NONE'
+
 expressionpath = doc['expressionpath']
 
 if __name__ == '__main__':
@@ -40,31 +45,32 @@ if __name__ == '__main__':
 
     for i, condition in enumerate(gene_conditions):
         with open(cluspath+'imat_%i.sh' % i, 'w+') as f:
-            f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J imat_{s}\n#SBATCH -c {c}\n#SBATCH --mem={m}G\n'
+            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J imat_{s}\n#SBATCH -c {c}\n#SBATCH --mem={m}G\n'
                     '#SBATCH -t {t}\n#SBATCH -o {p}imat_{s}_out.out\n#SBATCH -e {p}imat_{s}_err.out\n'
                     ''.format(s=condition, c=clus['cores'], m=clus['memory'], py=clus['pythonpath'], t=clus['time'],
-                              p=cluspath))
-            f.write('cd $SLURM_SUBMIT_DIR\ncd .\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
+                              p=cluspath, e=mail))
+            f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
             f.write('python utilities_cluster/cluster_weights_imat.py -c {s}'
                     ''.format(s=condition))
     with open('cluster_script_1.sh', 'w+') as f:
-        f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J script_1\n#SBATCH -o script_1_out.out\n#SBATCH '
+        f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_1\n#SBATCH -o script_1_out.out\n#SBATCH '
                 '-e script_1_err.out\ncd $SLURM_SUBMIT_DIR\nfor i in {l}\ndo\n    dos2unix {p}imat_"$i".sh'
                 '\n    sbatch {p}imat_"$i".sh\ndone'
-                ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath))
+                ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath, e=mail))
     if clus['approach'] == 'grouped':
         for i, condition in enumerate(gene_conditions):
             for j in range(clus['batch_num']):
                 rxn_range = str(clus['batch_rxn_sols']*j) + '_' + str(clus['batch_rxn_sols']*(j+1))
                 dist_a = (1 - 1 / (clus['batch_num'] * 2 * (clus['batch_div_sols'] / 10))) ** j
                 with open(cluspath + "batch_%i_%i.sh" % (i, j), "w+") as f:
-                    f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type=ALL\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
+                    f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type={e}\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
                             '\n#SBATCH -t {t}\n#SBATCH -J dexom_{i}_{j}\n#SBATCH -o {p}dexout_{i}_{j}.out\n#SBATCH -e '
                             '{p}dexerr_{i}_{j}.out\n'
-                            ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j, p=cluspath))
-                    f.write('cd $SLURM_SUBMIT_DIR\ncd .\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
+                            ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j,
+                                      p=cluspath, e=mail))
+                    f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                             'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
                             (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
                     f.write('python utilities_cluster/cluster_rxn_enum.py -c {c} -r {r} -p {p}\n'
@@ -72,20 +78,20 @@ if __name__ == '__main__':
                     f.write('python utilities_cluster/cluster_div_enum.py -c {c} -d {d} -i {maxiter} -p {p}'
                             ''.format(c=condition, d=dist_a, p=j, maxiter=clus['batch_div_sols']))
             with open(cluspath + 'dexom_%i.sh' % i, 'w+') as f:
-                f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J dexom_{i}\n#SBATCH -o {p}dexom_{i}_out.out\n'
+                f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J dexom_{i}\n#SBATCH -o {p}dexom_{i}_out.out\n'
                         '#SBATCH -e {p}dexom_{i}_err.out\ncd $SLURM_SUBMIT_DIR\nfor j in {l}\ndo'
                         '\n    dos2unix {p}batch_{i}_"$j".sh\n    sbatch {p}batch_{i}_"$j".sh\ndone'
-                        ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath))
+                        ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath, e=mail))
         with open('cluster_script_2.sh', 'w+') as f:
-            f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J script_2\n#SBATCH -o script_2_out.out\n#SBATCH '
+            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_2\n#SBATCH -o script_2_out.out\n#SBATCH '
                     '-e script_2_err.out\ncd $SLURM_SUBMIT_DIR\nfor i in {l}\ndo'
                     '\n    dos2unix {p}dexom_"$i".sh\n    sbatch {p}dexom_"$i".sh\ndone'
-                    ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath))
+                    ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath, e=mail))
         # write script 3
         with open('cluster_script_3.sh', 'w+') as f:
-            f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J script_3\n#SBATCH -o script_3_out.out\n#SBATCH '
+            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_3\n#SBATCH -o script_3_out.out\n#SBATCH '
                     '-e script_3_err.out\n#SBATCH --mem={m}G\n#SBATCH -c {c}\n#SBATCH -t {t}\n'
-                    ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
+                    ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time'], e=mail))
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
@@ -98,52 +104,54 @@ if __name__ == '__main__':
             for j in range(clus['batch_num']):
                 rxn_range = str(clus['batch_rxn_sols']*j) + '_' + str(clus['batch_rxn_sols']*(j+1))
                 with open(cluspath + "batch_r_%i_%i.sh" % (i, j), "w+") as f:
-                    f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type=ALL\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
+                    f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type={e}\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
                             '\n#SBATCH -t {t}\n#SBATCH -J rxnenum_{i}_{j}\n#SBATCH -o {p}rxnenumout_{i}_{j}.out\n#SBATCH '
                             '-e {p}rxnenumerr_{i}_{j}.out\n'
-                            ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j, p=cluspath))
-                    f.write('cd $SLURM_SUBMIT_DIR\ncd .\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
+                            ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j,
+                                      p=cluspath, e=mail))
+                    f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                             'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
                             (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
                     f.write('python utilities_cluster/cluster_rxn_enum.py -c {c} -r {r} -p {p}\n'
                             ''.format(c=condition, r=rxn_range, p=j))
                 dist_a = (1 - 1 / (clus['batch_num'] * 2 * (clus['batch_div_sols'] / 10))) ** j
                 with open(cluspath + "batch_d_%i_%i.sh" % (i, j), "w+") as f:
-                    f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type=ALL\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
+                    f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type={e}\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
                             '\n#SBATCH -t {t}\n#SBATCH -J divenum_{i}_{j}\n#SBATCH -o {p}divenum_{i}_{j}.out\n#SBATCH -e '
                             '{p}divenum_{i}_{j}.out\n'
-                            ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j, p=cluspath))
-                    f.write('cd $SLURM_SUBMIT_DIR\ncd .\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
+                            ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j,
+                                      p=cluspath, e=mail))
+                    f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                             'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
                             (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
                     f.write('python utilities_cluster/cluster_div_enum.py -c {c} -d {d} -i {maxiter} -p {p}'
                             ''.format(c=condition, d=dist_a, p=j, maxiter=clus['batch_div_sols']))
             with open(cluspath + 'rxnenum_%i.sh' % i, 'w+') as f:
-                f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J rxnenum_{i}\n#SBATCH -o {p}rxnenum_{i}_out.out'
+                f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J rxnenum_{i}\n#SBATCH -o {p}rxnenum_{i}_out.out'
                         '\n#SBATCH -e {p}rxnenum_{i}_err.out\ncd $SLURM_SUBMIT_DIR\nfor j in {l}\ndo'
                         '\n    dos2unix {p}batch_r_{i}_"$j".sh\n    sbatch {p}batch_r_{i}_"$j".sh\ndone'
-                        ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath))
+                        ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath, e=mail))
             with open(cluspath + 'divenum_%i.sh' % i, 'w+') as f:
-                f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J {p}divenum_{i}\n#SBATCH -o {p}divenum_{i}_out.out'
+                f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J {p}divenum_{i}\n#SBATCH -o {p}divenum_{i}_out.out'
                         '\n#SBATCH -e divenum_{i}_err.out\ncd $SLURM_SUBMIT_DIR\nfor j in {l}\ndo'
                         '\n    dos2unix {p}batch_d_{i}_"$j".sh\n    sbatch {p}batch_d_{i}_"$j".sh\ndone'
-                        ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath))
+                        ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath, e=mail))
         with open('cluster_script_2.sh', 'w+') as f:
-            f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J script_2\n#SBATCH -o script_2_out.out\n#SBATCH '
+            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_2\n#SBATCH -o script_2_out.out\n#SBATCH '
                     '-e script_2_err.out\ncd $SLURM_SUBMIT_DIR\nfor i in {l}\ndo'
                     '\n    dos2unix {p}rxnenum_"$i".sh\n    sbatch {p}rxnenum_"$i".sh\ndone'
-                    ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath))
+                    ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath, e=mail))
         with open('cluster_script_3.sh', 'w+') as f:
-            f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J script_3\n#SBATCH -o script_3_out.out\n#SBATCH '
+            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_3\n#SBATCH -o script_3_out.out\n#SBATCH '
                     '-e script_3_err.out\ncd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load {py}\n'
                     'source {e}/bin/activate\npython utilities_cluster/cluster_concat_rxn_solutions.py\nfor i in {l}'
                     '\ndo\n    dos2unix {p}divenum_"$i".sh\n    sbatch {p}divenum_"$i".sh\ndone'
                     ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath, py=clus['pythonpath'], e=clus['envpath']))
         # write script 4
         with open('cluster_script_4.sh', 'w+') as f:
-            f.write('#!/bin/bash\n#SBATCH --mail-type=ALL\n#SBATCH -J script_4\n#SBATCH -o script_4_out.out\n#SBATCH '
+            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_4\n#SBATCH -o script_4_out.out\n#SBATCH '
                     '-e script_4_err.out\n#SBATCH --mem={m}G\n#SBATCH -c {c}\n#SBATCH -t {t}\n'
-                    ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
+                    ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time'], e=mail))
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))

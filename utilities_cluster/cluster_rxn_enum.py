@@ -45,7 +45,6 @@ if __name__ == '__main__':
                         help='column of the gene expression file containing the data for one condition')
     parser.add_argument('-r', '--rxn_range', default='_', help='range of reactions')
     parser.add_argument('-p', '--parallel_id', type=str, default='', help='id of the parallel thread')
-    parser.add_argument('-a', '--approach', type=int, default=2, help='DEXOM approach')
     args = parser.parse_args()
     # read model
     model = dexom_python.read_model(modelpath, solver=mp['solver'])
@@ -78,13 +77,18 @@ if __name__ == '__main__':
         start = int(rxn_range[0])
     if rxn_range[1] == '':
         rxn_list = reactions[start:]
-    elif int(rxn_range[1]) > len(reactions):
+    elif int(rxn_range[1]) >= len(reactions):
         rxn_list = reactions[start:]
     else:
         rxn_list = reactions[start:int(rxn_range[1])]
     rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
-                                                  obj_tol=ep['objective_tolerance'], thr=ip['threshold'])
+                                                  obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
     uniques = pd.DataFrame(rxnsol.unique_binary)
+    print("\nuniques")
+    print(uniques)
+    print("\nall")
+    print(pd.DataFrame(rxnsol.all_binary))
+
     uniques.to_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
 
     # if clus['approach'] == 'grouped':
