@@ -37,6 +37,3 @@ Because the enumeration of multiple solutions with DEXOM can be very slow when u
 Parameters for the cluster pipeline can be found in `cluster_params.yaml`  
 
 Refer to the [cluster instructions file](cluster_instructions.md) for an explanation fo the cluster pipeline.
-
-## Todo
-test cluster pipeline with FLuoBIOME data
