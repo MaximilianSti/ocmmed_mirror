@@ -3,16 +3,16 @@
 
 modelpath: pilot_data/Human-GEM11.xml
 # must be a valid cobrapy model (either .xml, .json, or .mat)
-expressionpath: pilot_data/gene_IDs_meanvalues.csv
+expressionpath: FluoBIOME/PFOA_allgenes_meanvalues.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
-output_path: pilot_data_results_cluster/
+output_path: FluoBIOME_results_J28/
 # if this path contains a '/', then it must be an existing folder
 
 ### these parameters are for the gene expression file
 
-gene_ID_column: gene_IDs
+gene_ID_column: ID
 # name of the column containing gene IDs
-gene_expression_columns: DMSO,BPA
+gene_expression_columns: PFOA_0uM_J28,PFOA_0.001uM_J28,PFOA_0.1uM_J28,PFOA_10uM_J28,Feno_450uM_J28
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
 # if empty, all columns (except the gene_ID_column) will be used
@@ -24,7 +24,7 @@ gpr_parameters:
   qualitative: true
   # if true, the gene expression will be converted to reaction weights -1/0/1
   # if false, the expression will directly be mapped to the reactions
-  percentile: 0.05
+  percentile: 0.25
   # the percentile cutoff for low/high gene expression (this is only used if qualitative: true)
   # example: with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
 
@@ -43,11 +43,11 @@ fluxvalue: 1e-4
 # minimum value that the flux should have.
 
 force_flux_bounds:
-  MAR03905: 0,1000
+#  MAR03905: 0,1000
 # manually define the lower and upper flux bounds for some reactions
 
-rxn_enum_iterations: 2
-div_enum_iterations: 2
+rxn_enum_iterations: 3
+div_enum_iterations: 3
 # number of iterations for reaction-enum and diversity-enum (if using the main.py script)
 
 ### these parameters are for the network computation in the final step

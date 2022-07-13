@@ -26,7 +26,7 @@ enum_params:
   # if you are using discrete weights instead of qualitative weights, increase this parameter up to 1e-2 for faster runtimes
 
 rxn_enum_params:
-  reaction_list: # pilot_data/HumanGEM11_reactions_shuffled.csv
+  reaction_list: pilot_data/HumanGEM11_reactions_shuffled.csv
   # providing a shuffled list of reactions can reduce possible bias in the reaction-enumeration method
   # if left empty, the reactions will be used in the order in which they are in the network
 

@@ -84,10 +84,6 @@ if __name__ == '__main__':
     rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
                                                   obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
     uniques = pd.DataFrame(rxnsol.unique_binary)
-    print("\nuniques")
-    print(uniques)
-    print("\nall")
-    print(pd.DataFrame(rxnsol.all_binary))
 
     uniques.to_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
 

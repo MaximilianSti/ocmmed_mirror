@@ -3,11 +3,11 @@ cluster_files: cluster_files/
 # path where various files will be saved for the cluster computation
 # recommendation: use 2 different registries for cluster_files and output_path
 
-batch_num: 10
+batch_num: 5
 # number of parallel batches for each condition
-batch_rxn_sols: 100
+batch_rxn_sols: 10
 # number of reaction-enum solutions per batch
-batch_div_sols: 100
+batch_div_sols: 10
 # number of diversity-enum solutions per batch
 
 approach: separate
@@ -18,7 +18,7 @@ approach: separate
 # if 'separate': reaction-enum solutions will be computed first, then concatenated, and div-enum solutions
 #                will be computed separately
 
-emails: true
+emails: false
 # if true, you will receive an email alert everytime a batch starts and ends
 # if false, you will only receive no email alerts
 cores: 24
