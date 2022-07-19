@@ -5,8 +5,6 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 
-
-# read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()

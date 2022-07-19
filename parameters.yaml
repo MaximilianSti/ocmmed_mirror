@@ -2,17 +2,17 @@
 ### these are the filepaths used in the pipeline
 
 modelpath: pilot_data/Human-GEM11.xml
-# must be a valid cobrapy model (either .xml, .json, or .mat)
-expressionpath: FluoBIOME/PFOA_allgenes_meanvalues.csv
+# must be a valid cobrapy tests (either .xml, .json, or .mat)
+expressionpath: Metachol/metachol_allgenes_meanvalues.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
-output_path: FluoBIOME_results_J28/
+output_path: Metachol_results/
 # if this path contains a '/', then it must be an existing folder
 
 ### these parameters are for the gene expression file
 
-gene_ID_column: ID
+gene_ID_column: ENSG
 # name of the column containing gene IDs
-gene_expression_columns: PFOA_0uM_J28,PFOA_0.001uM_J28,PFOA_0.1uM_J28,PFOA_10uM_J28,Feno_450uM_J28
+gene_expression_columns:
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
 # if empty, all columns (except the gene_ID_column) will be used
@@ -35,8 +35,8 @@ reaction_scores: false
 ### these parameters are for the network enumeration
 
 force_active_reactions: true
-# define whether some reactions in the model should be forced to carry flux
-active_reactions: # use the reaction IDs from the model to define the reactions which must carry flux
+# define whether some reactions in the tests should be forced to carry flux
+active_reactions: # use the reaction IDs from the tests to define the reactions which must carry flux
 #  - MAR13082 # this is the generic biomass reaction for human1
   - MAR09931 # this is the biomass maintenance reaction with upper bound 0
 fluxvalue: 1e-4

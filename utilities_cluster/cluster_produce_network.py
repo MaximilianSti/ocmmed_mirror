@@ -7,8 +7,6 @@ from warnings import warn
 from utilities.minimal import mba
 from cobra.io import write_sbml_model
 
-
-# read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
@@ -28,6 +26,8 @@ if clus['cluster_files']:
 else:
     cluspath = outpath
 
+expressionpath = doc['expressionpath']
+
 
 if __name__ == '__main__':
     description = 'Concatenates all dexom solutions and saves the network'
@@ -35,7 +35,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
-    gene_conditions = [c.strip() for c in doc['gene_expression_columns'].split(',')]
+    genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
+    if doc['gene_expression_columns']:
+        gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
+    else:
+        gene_conditions = genes.columns.to_list()
     all_sols = []
     for condition in gene_conditions:
         solutions = []

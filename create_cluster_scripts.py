@@ -3,7 +3,7 @@ import pandas as pd
 from warnings import warn
 
 
-# read configuration from YAML file
+# read configuration from YAML files
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
@@ -133,7 +133,7 @@ if __name__ == '__main__':
                         ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath, e=mail))
             with open(cluspath + 'divenum_%i.sh' % i, 'w+') as f:
                 f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J {p}divenum_{i}\n#SBATCH -o {p}divenum_{i}_out.out'
-                        '\n#SBATCH -e divenum_{i}_err.out\ncd $SLURM_SUBMIT_DIR\nfor j in {l}\ndo'
+                        '\n#SBATCH -e {p}divenum_{i}_err.out\ncd $SLURM_SUBMIT_DIR\nfor j in {l}\ndo'
                         '\n    dos2unix {p}batch_d_{i}_"$j".sh\n    sbatch {p}batch_d_{i}_"$j".sh\ndone'
                         ''.format(i=i, l='{0..%i}' % (clus['batch_num']-1), p=cluspath, e=mail))
         with open('cluster_script_2.sh', 'w+') as f:

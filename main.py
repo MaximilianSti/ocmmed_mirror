@@ -8,7 +8,7 @@ from utilities.minimal import mba
 from warnings import warn
 
 
-# read configuration from YAML file
+# read configuration from YAML files
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()

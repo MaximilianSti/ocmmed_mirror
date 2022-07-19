@@ -6,8 +6,6 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 
-
-# read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
@@ -37,7 +35,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-c', '--condition', help='column of the gene expression file containing the data for one condition')
     args = parser.parse_args()
-    # read model
+    # read tests
     model = dexom_python.read_model(modelpath, solver=mp['solver'])
     model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])

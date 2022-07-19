@@ -3,11 +3,11 @@ cluster_files: cluster_files/
 # path where various files will be saved for the cluster computation
 # recommendation: use 2 different registries for cluster_files and output_path
 
-batch_num: 5
+batch_num: 6
 # number of parallel batches for each condition
-batch_rxn_sols: 10
+batch_rxn_sols: 13
 # number of reaction-enum solutions per batch
-batch_div_sols: 10
+batch_div_sols: 15
 # number of diversity-enum solutions per batch
 
 approach: separate

@@ -3,9 +3,8 @@ import ruamel.yaml as yaml
 import pandas as pd
 from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
+from warnings import warn
 
-
-# read configuration from YAML file
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
@@ -71,7 +70,7 @@ if __name__ == '__main__':
         rxnenum_sols.columns = prevsol.fluxes.index
         prevsol.fluxes = rxnenum_sols.iloc[int(args.parallel_id)]
     else:
-        print("could not recognise approach, using iMAT solution as previous solution")
+        warn("could not recognise approach, using iMAT solution as previous solution")
 
     if args.dist_anneal >= 0:
         distanneal = args.dist_anneal
