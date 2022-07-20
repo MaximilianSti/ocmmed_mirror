@@ -1,12 +1,13 @@
 
 # OCMMED cluster pipeline
 
-| Table of contents                                                                          |
-|--------------------------------------------------------------------------------------------|
-| [Installation instructions](cluster_instructions.md#Installation-instructions)             |
-| [Installing cplex on the cluster](cluster_instructions.md#Installing-cplex-on-the-cluster) |
-| [Setting parameters](cluster_instructions.md#Setting-parameters)                           |
-| [Running the pipeline](cluster_instructions.md#Running-the-pipeline)                       | 
+| Table of contents                                                                                    |
+|------------------------------------------------------------------------------------------------------|
+| [Installation instructions](cluster_instructions.md#Installation-instructions)                       |
+| [Installing cplex on the cluster](cluster_instructions.md#Installing-cplex-on-the-cluster)           |
+| [Setting parameters](cluster_instructions.md#Setting-parameters)                                     |
+| [Running the pipeline](cluster_instructions.md#Running-the-pipeline)                                 | 
+| [Files created by the cluster scripts](cluster_instructions.md#Files-created-by-the-cluster-scripts) | 
 
 ## Installation instructions
 
@@ -88,16 +89,16 @@ If the folder doesn't exist, you will get an error when the program tries to sav
 
 - Modifying the parameters in `additional_params.yaml` is optional. 
 
-If your iterations take very long, you may want to set a higher `timelimit` or increase one of the tolerance parameters.
+If your iterations take very long and often hit the timelimit, you may want to set a higher `timelimit` or increase one of the tolerance parameters.
 
 - Modify the parameters in `cluster_params.yaml`
 
 If, during the installation, you modified the path to the python module `system/Python-3.7.4`, then you must also modify the `pythonpath` parameter  
 The `cluster_files` parameter must also be an existing folder in the ocmmed directory.  
-It's recommended to use a separate folder for the cluster files, as the program will create many files which can be deleted after the run is finished.
+It's recommended to use a separate folder for the cluster files, as the program will create many files which are not necessary to keep after the run is finished.
 
-Note that on the cluster, the `rxn_enum_iterations` and `div_enum_iterations` parameter in the `parameters.yaml` file are ignored.  
-Instead, you must use the `batch_num`, `batch_rxn_sols` and `batch_div_sols` parameters in the `cluster_params.yaml` file
+Note that on the cluster, the `rxn_enum_iterations` and `div_enum_iterations` parameters in the `parameters.yaml` file are ignored.  
+Instead, you must use the `batch_num`, `batch_rxn_sols` and `batch_div_sols` parameters in the `cluster_params.yaml` file to set the number of iterations.
 
 The `separate` approach is divided into 4 different scripts: 
 - one for computing reaction-weights and a starting iMAT solution
@@ -123,19 +124,102 @@ cluster_script_3.sh
 ```
 If you are using the `separate` approach, it will also create `cluster_script_4.sh`
 
-You can then launch the first script: `sbatch cluster_script_1.sh`
-
+Launch the first script: `sbatch cluster_script_1.sh`  
 You must then wait until all the computation is finished before launching the next script.  
 The script is finished once your output-path contains reaction-weights and imat-solutions for every experimental condition.
 
-You can then launch the second script: `sbatch cluster_script_2.sh`
-
+You can then launch the second script: `sbatch cluster_script_2.sh`  
 This script will take longer before it is finished.  
-In the separate approach, you must wait until your cluster-files path contains a file called `rxn_enum_solutions_conditionname_batchnumber.csv` for every condition & every batch.  
-In the grouped appraoch, you must additionally wait until you have every `div_enum_solutions_conditionname_batchnumber.csv`
+In the _separate_ approach, you must wait until your cluster-files path contains a file called `rxn_enum_solutions_conditionname_batchnumber.csv` for every condition & every batch.  
+In the _grouped_ appraoch, you must additionally wait until every `div_enum_solutions_conditionname_batchnumber.csv` has been created.
 
-You can then launch the second script: `sbatch cluster_script_3.sh`
-In the separate approach, this will now create the `div_enum_solutions_conditionname_batchnumber.csv` files  
-In the grouped approach, this will create the `cellspecific_model.xml` file in your output-path
+You can then launch the next script: `sbatch cluster_script_3.sh`  
+In the _separate_ approach, this will now create the `div_enum_solutions_conditionname_batchnumber.csv` files  
+In the _grouped_ approach, this will create the `cellspecific_model.xml` file in your output-path
 
-In the separate approach, `sbatch cluster_script_4.sh` will create the `cellspecific_model.xml` file in your output-path.
+In the _separate_ approach, `sbatch cluster_script_4.sh` will create the `cellspecific_model.xml` file in your output-path.
+
+## Files created by the cluster scripts
+
+Below is a detailed list of all the files that are produced by the cluster scripts.   
+This can be useful to check if one script has finished running or not before you launch the next script.
+
+#### cluster_script_1
+If the parameter `qualitative` is set to `true`, this will produce the file geneweights_qualitative.csv in the output_path.  
+Then, for each condition, this script produces the following files:  
+- **in output_path:**  
+  - imat_solution_condition.csv  
+  - reaction_weight_condition.csv  
+- **in cluster_files:**  
+  - imat_condition_err.out  
+  - imat_condition_out.out  
+
+Therefore, the total number of newly created files is: num_conditions * 4  (+ 1 if geneweights_qualtitative is present)  
+
+### approach: separate
+
+**cluster_script_2**  
+This script only produces files in the cluster_files folder.  
+- **for every condition:**  
+    - rxnenum_conditionnumber_err.out  
+    - rxnenum_conditionnumber_out.out  
+- **for every condition and every batch:**  
+    - rxnenum_conditionnumber_batchnumber_err.out  
+    - rxnenum_conditionnumber_batchnumber_out.out  
+    - rxn_enum_solutions_condition_batchnumber.csv  
+
+The total number of newly created files is: num_conditions * (num_batches * 3 + 2 )
+
+**cluster_script_3**  
+This script only produces files in the cluster_files folder.  
+- **for every condition:**  
+    - full_rxn_enum_solutions_condition.csv  
+    - divenum_conditionnumber_err.out  
+    - divenum_conditionnumber_out.out  
+- **for every condition and every batch:**  
+    - divenum_conditionnumber_batchnumber_err.out  
+    - divenum_conditionnumber_batchnumber_out.out  
+    - div_enum_condition_batchnumber_solutions.csv  
+    - div_enum_condition_batchnumber_stats.csv  
+
+The total number of newly created files is: num_conditions * (num_batches * 4 + 3)  
+
+**cluster_script_4**  
+- **in cluster_files, for every condition:**  
+    - full_div_enum_solutions_condition.csv  
+- **in output_path, for every condition:**  
+    - all_DEXOM_solutions_condition.csv  
+- **in output_path:**  
+    - all_DEXOM_solutions.csv  
+    - activation_frequency_reactions.csv  
+    - cellspecific_model.xml  
+
+The total number of newly created files is: num_conditions * 2 + 3  
+
+### approach: grouped
+**cluster_script_2**  
+This script only produces files in the cluster_files folder.  
+- **for every condition:**  
+	- dexom_conditionnumber_err.out  
+	- dexom_conditionnumber_out.out  
+- **for every condition and every batch:**  
+    - dex_conditionnumber_batchnumber_err.out  
+    - dex_conditionnumber_batchnumber_out.out  
+    - rxn_enum_solutions_condition_batchnumber.csv  
+    - div_enum_condition_batchnumber_solutions.csv  
+    - div_enum_condition_batchnumber_stats.csv  
+
+The total number of newly created files is: num_conditions * (num_batches * 5 + 2)  
+
+**cluster_script_3**  
+- **in cluster_files, for every condition:**  
+    - full_rxn_enum_solutions_condition.csv  
+    - full_div_enum_solutions_condition.csv  
+- **in output_path, for every condition:**  
+    - all_dexom_solutions_condition.csv  
+- **in output_path:**  
+    - all_DEXOM_solutions.csv  
+    - activation_frequency_reactions.csv  
+    - cellspecific_model.xml  
+
+The total number of newly created files is: num_conditions * 3 + 3  

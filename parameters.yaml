@@ -3,14 +3,14 @@
 
 modelpath: pilot_data/Human-GEM11.xml
 # must be a valid cobrapy tests (either .xml, .json, or .mat)
-expressionpath: Metachol/metachol_allgenes_meanvalues.csv
+expressionpath: pilot_data/gene_IDs_meanvalues.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
-output_path: Metachol_results/
+output_path: pilot_data_results/
 # if this path contains a '/', then it must be an existing folder
 
 ### these parameters are for the gene expression file
 
-gene_ID_column: ENSG
+gene_ID_column: ID
 # name of the column containing gene IDs
 gene_expression_columns:
 # names of the columns containing gene expression data

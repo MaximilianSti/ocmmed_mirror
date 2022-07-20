@@ -66,8 +66,8 @@ if __name__ == '__main__':
                 dist_a = (1 - 1 / (clus['batch_num'] * 2 * (clus['batch_div_sols'] / 10))) ** j
                 with open(cluspath + "batch_%i_%i.sh" % (i, j), "w+") as f:
                     f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type={e}\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
-                            '\n#SBATCH -t {t}\n#SBATCH -J dexom_{i}_{j}\n#SBATCH -o {p}dexout_{i}_{j}.out\n#SBATCH -e '
-                            '{p}dexerr_{i}_{j}.out\n'
+                            '\n#SBATCH -t {t}\n#SBATCH -J dexom_{i}_{j}\n#SBATCH -o {p}dex_{i}_{j}_out.out\n#SBATCH -e '
+                            '{p}dex_{i}_{j}_err.out\n'
                             ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j,
                                       p=cluspath, e=mail))
                     f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
@@ -96,6 +96,7 @@ if __name__ == '__main__':
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
             f.write('\npython utilities_cluster/cluster_concat_rxn_solutions.py\n'
+                    'python utilities_cluster/cluster_concat_dex_solutions.py\n'
                     'python utilities_cluster/cluster_produce_network.py'
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
 
@@ -105,8 +106,8 @@ if __name__ == '__main__':
                 rxn_range = str(clus['batch_rxn_sols']*j) + '_' + str(clus['batch_rxn_sols']*(j+1))
                 with open(cluspath + "batch_r_%i_%i.sh" % (i, j), "w+") as f:
                     f.write('#!/bin/bash\n#SBATCH -p workq\n#SBATCH --mail-type={e}\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
-                            '\n#SBATCH -t {t}\n#SBATCH -J rxnenum_{i}_{j}\n#SBATCH -o {p}rxnenumout_{i}_{j}.out\n#SBATCH '
-                            '-e {p}rxnenumerr_{i}_{j}.out\n'
+                            '\n#SBATCH -t {t}\n#SBATCH -J rxnenum_{i}_{j}\n#SBATCH -o {p}rxnenum_{i}_{j}_out.out\n#SBATCH '
+                            '-e {p}rxnenum_{i}_{j}_err.out\n'
                             ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], i=i, j=j,
                                       p=cluspath, e=mail))
                     f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
@@ -156,7 +157,8 @@ if __name__ == '__main__':
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
-            f.write('\npython utilities_cluster/cluster_produce_network.py'
+            f.write('\npython utilities_cluster/cluster_concat_dex_solutions.py'
+                    '\npython utilities_cluster/cluster_produce_network.py'
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
     else:
         warn("Could not identify approach")
