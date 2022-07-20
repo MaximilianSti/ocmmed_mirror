@@ -2,7 +2,7 @@
 ### these are the filepaths used in the pipeline
 
 modelpath: pilot_data/Human-GEM11.xml
-# must be a valid cobrapy tests (either .xml, .json, or .mat)
+# must be a valid cobrapy model (either .xml, .json, or .mat)
 expressionpath: pilot_data/gene_IDs_meanvalues.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
 output_path: pilot_data_results/
@@ -35,8 +35,8 @@ reaction_scores: false
 ### these parameters are for the network enumeration
 
 force_active_reactions: true
-# define whether some reactions in the tests should be forced to carry flux
-active_reactions: # use the reaction IDs from the tests to define the reactions which must carry flux
+# define whether some reactions in the model should be forced to carry flux
+active_reactions: # use the reaction IDs from the model to define the reactions which must carry flux
 #  - MAR13082 # this is the generic biomass reaction for human1
   - MAR09931 # this is the biomass maintenance reaction with upper bound 0
 fluxvalue: 1e-4
