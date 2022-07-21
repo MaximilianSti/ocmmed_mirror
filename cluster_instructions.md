@@ -126,6 +126,7 @@ If you are using the `separate` approach, it will also create `cluster_script_4.
 
 Launch the first script: `sbatch cluster_script_1.sh`  
 You must then wait until all the computation is finished before launching the next script.  
+On a slurm cluster, you can use the command `squeue -u username` to check if any of your scripts are still running.  
 The script is finished once your output-path contains reaction-weights and imat-solutions for every experimental condition.
 
 You can then launch the second script: `sbatch cluster_script_2.sh`  
@@ -141,15 +142,15 @@ In the _separate_ approach, `sbatch cluster_script_4.sh` will create the `cellsp
 
 ## Files created by the cluster scripts
 
-Below is a detailed list of all the files that are produced by the cluster scripts.   
-This can be useful to check if one script has finished running or not before you launch the next script.
+Below is an overview of all the files that are produced by the cluster scripts.   
+This can be useful to check if a script has correctly finished running before launching the next script.
 
-#### cluster_script_1
+**cluster_script_1**  
 If the parameter `qualitative` is set to `true`, this will produce the file geneweights_qualitative.csv in the output_path.  
 Then, for each condition, this script produces the following files:  
 - **in output_path:**  
   - imat_solution_condition.csv  
-  - reaction_weight_condition.csv  
+  - reaction_weights_condition.csv  
 - **in cluster_files:**  
   - imat_condition_err.out  
   - imat_condition_out.out  

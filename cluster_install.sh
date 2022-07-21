@@ -2,7 +2,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH -J cluster_install
 #SBATCH -o cluster_install_out.out
-#SBATCH -e cluster_installe_err.out
+#SBATCH -e cluster_install_err.out
 
 cd $SLURM_SUBMIT_DIR
 git clone https://forgemia.inra.fr/metexplore/cbm/ocmmed.git ocmmed

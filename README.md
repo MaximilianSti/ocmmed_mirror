@@ -7,7 +7,9 @@ Obtaining cell-specific metabolic models through enumeration with DEXOM
 - python packages in the `requirements.txt` file
 
 ## Installation
-Refer to installation instructions for dexom-python: https://pypi.org/project/dexom-python/
+For the installation of the cluster pipeline, see [cluster instructions file](cluster_instructions.md).
+
+For installing CPLEX on your own computer, see the instructions in the dexom-python package: https://pypi.org/project/dexom-python/
 
 ## Parameters
 The `parameters.yaml` file contains the main parameters, including the path to the metabolic model and the path to the gene expression file  
