@@ -31,30 +31,10 @@ expressionpath = doc['expressionpath']
 
 if __name__ == '__main__':
     description = 'Concatenates all dexom solutions and saves the network'
-
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
-    genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
-    if doc['gene_expression_columns']:
-        gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
-    else:
-        gene_conditions = genes.columns.to_list()
-    all_sols = []
-    for condition in gene_conditions:
-        solutions = []
-        solfiles = Path(cluspath).glob('div_enum_solutions_%s_*.csv' % condition)
-        for f in solfiles:
-            sol = pd.read_csv(f, index_col=0)
-            solutions.append(sol)
-        divsols = pd.concat(solutions).drop_duplicates(ignore_index=True)
-        divsols.to_csv(cluspath + 'full_div_enum_solutions_%s.csv' % condition)
-        rxnsols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
-        dexomsols = pd.concat([divsols, rxnsols]).drop_duplicates(ignore_index=True)
-        dexomsols.to_csv(outpath + 'all_DEXOM_solutions_%s.csv' % condition)
-        all_sols.append(dexomsols)
-    dex = pd.concat(all_sols).drop_duplicates(ignore_index=True)
-
+    dex = pd.read_csv(outpath + 'all_DEXOM_solutions.csv')
     model = dexom_python.read_model(doc['modelpath'])
     dex.columns = [r.id for r in model.reactions]
     frequencies = dex.sum()

@@ -37,7 +37,6 @@ modelpath = doc['modelpath']
 
 if __name__ == '__main__':
     description = 'For a given condition, performs reaction-enumeration'
-
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-c', '--condition',
                         help='column of the gene expression file containing the data for one condition')
@@ -67,7 +66,6 @@ if __name__ == '__main__':
             reactions = [r.id for r in model.reactions]
     else:
         reactions = [r.id for r in model.reactions]
-
     rxn_range = args.rxn_range.split('_')
     if rxn_range[0] == '':
         start = 0
@@ -82,7 +80,6 @@ if __name__ == '__main__':
     rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
                                                   obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
     uniques = pd.DataFrame(rxnsol.unique_binary)
-
     uniques.to_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
 
     # if clus['approach'] == 'grouped':

@@ -37,9 +37,7 @@ modelpath = doc['modelpath']
 
 
 if __name__ == '__main__':
-
     description = 'For a given condition calculates reaction weights and computes iMAT solution'
-
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-c', '--condition', help='column of the gene expression file containing the data for one condition')
     parser.add_argument('-d', '--dist_anneal', type=float, default=-1., help='diversity-enum dist_anneal parameter')
@@ -50,9 +48,7 @@ if __name__ == '__main__':
     model = dexom_python.read_model(modelpath, solver=mp['solver'])
     model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
-
     condition = args.condition
-
     if doc['force_active_reactions']:
         force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
     if doc['force_flux_bounds']:

@@ -27,7 +27,6 @@ expressionpath = doc['expressionpath']
 
 if __name__ == '__main__':
     description = 'Concatenates all reaction-enumeration solutions'
-
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 

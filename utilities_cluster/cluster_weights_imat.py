@@ -29,9 +29,7 @@ expressionpath = doc['expressionpath']
 
 
 if __name__ == '__main__':
-
     description = 'For a given condition calculates reaction weights and computes iMAT solution'
-
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-c', '--condition', help='column of the gene expression file containing the data for one condition')
     args = parser.parse_args()
@@ -39,7 +37,6 @@ if __name__ == '__main__':
     model = dexom_python.read_model(modelpath, solver=mp['solver'])
     model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
-
     condition = args.condition
     # read and process gene expression file
     genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
@@ -47,7 +44,6 @@ if __name__ == '__main__':
         genes = dexom_python.expression2qualitative(genes=genes, column_list=[condition],
                                                     proportion=doc['gpr_parameters']['percentile'],
                                                     outpath=outpath+'geneweights_qualitative')
-
     # create reaction weights from gene expression
     print('computing reaction weights for condition '+condition)
     gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)
@@ -62,7 +58,6 @@ if __name__ == '__main__':
 
     # compute imat solution from reaction weights
     print('performing iMAT for condition ' + condition)
-
     if doc['force_active_reactions']:
         force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
     if doc['force_flux_bounds']:
