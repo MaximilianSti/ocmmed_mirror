@@ -1,7 +1,12 @@
+import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
-import argparse
 from pathlib import Path
+from warnings import warn
+from utilities.minimal import mba
+from utilities.inactive_pathways import compute_inactive_pathways
+from cobra.io import write_sbml_model
+from cobra import Configuration
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -23,13 +28,11 @@ else:
     cluspath = outpath
 
 expressionpath = doc['expressionpath']
+cobra_config = Configuration()
+cobra_config.solver = 'gurobi'
 
 
 if __name__ == '__main__':
-    description = 'Concatenates all diversity-enumeration solutions'
-    parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
-    args = parser.parse_args()
-
     genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
@@ -50,3 +53,21 @@ if __name__ == '__main__':
         all_sols.append(dexomsols)
     dex = pd.concat(all_sols).drop_duplicates(ignore_index=True)
     dex.to_csv(outpath + 'all_DEXOM_solutions.csv')
+    print("concatenated all DEXOM solutions")
+    model = dexom_python.read_model(doc['modelpath'], solver='gurobi')
+    dex.columns = [r.id for r in model.reactions]
+    frequencies = dex.sum()
+    frequencies.columns = ['frequency']
+    frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
+    print("saved frequencies")
+    if doc['final_network'] == 'union':
+        rem_rxns = dex.columns[frequencies == 0].to_list()  # remove reactions which are active in zero solutions
+        model.remove_reactions(rem_rxns, remove_orphans=True)
+    elif doc['final_network'] == 'minimal':
+        model = mba(model_keep=model, enum_solutions=dex, essential_reactions=doc['active_reactions'])
+    else:
+        warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
+    model.id += '_cellspecific'
+    print('number of reactions in the model:', len(model.reactions))
+    write_sbml_model(model, outpath+'cellspecific_model.xml')
+    compute_inactive_pathways(model)

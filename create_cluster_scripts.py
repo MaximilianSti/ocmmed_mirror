@@ -96,8 +96,7 @@ if __name__ == '__main__':
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
             f.write('\npython utilities_cluster/cluster_concat_rxn_solutions.py\n'
-                    'python utilities_cluster/cluster_concat_dex_solutions.py\n'
-                    'python utilities_cluster/cluster_produce_network.py'
+                    'python utilities_cluster/cluster_final_network.py'
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
 
     elif clus['approach'] == 'separate':
@@ -157,8 +156,7 @@ if __name__ == '__main__':
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
-            f.write('\npython utilities_cluster/cluster_concat_dex_solutions.py'
-                    '\npython utilities_cluster/cluster_produce_network.py'
+            f.write('\npython utilities_cluster/cluster_final_network.py'
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
     else:
         warn("Could not identify approach")
