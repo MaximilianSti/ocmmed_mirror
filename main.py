@@ -5,6 +5,7 @@ from cobra.io import write_sbml_model
 import optlang
 from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.minimal import mba
+from utilities.inactive_pathways import compute_inactive_pathways
 from warnings import warn
 
 
@@ -131,3 +132,4 @@ if __name__ == '__main__':
         warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     new_model.id += '_cellspecific'
     write_sbml_model(new_model, outpath+'cellspecific_model.xml')
+    compute_inactive_pathways(new_model)

@@ -39,3 +39,7 @@ div_enum_params:
   full: false
   # if true, will use the full-DEXOM implementation (see dexom-python documentation).
   # This very significantly increases the computation time per iteration and should only be done on small models
+
+blocked_rxns: pilot_data/human-gem11_blocked.txt
+# Optional: provide a list of reactions which are blocked in the model.
+# This will be used for determining which reactions are inactive in the cell-specific model

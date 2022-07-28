@@ -1,11 +1,7 @@
-import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
 import argparse
 from pathlib import Path
-from warnings import warn
-from utilities.minimal import mba
-from cobra.io import write_sbml_model
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -34,7 +30,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
-    print("start")
     genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
