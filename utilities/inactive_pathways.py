@@ -14,12 +14,15 @@ with open('additional_params.yaml', 'r') as file:
 params = yaml_reader.load(b)
 if doc['output_path']:
     outpath = doc['output_path']
+    if outpath[-1] not in ['/', '\\']:
+        outpath += '/'
 else:
     outpath = ''
 modelpath = doc['modelpath']
 
 cobra_config = Configuration()
 cobra_config.solver = 'gurobi'
+
 
 def compute_inactive_pathways(model):
     fullmodel = dexom_python.read_model(modelpath)

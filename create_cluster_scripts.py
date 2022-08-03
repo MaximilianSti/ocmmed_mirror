@@ -1,6 +1,7 @@
 import ruamel.yaml as yaml
 import pandas as pd
 from warnings import warn
+import os
 
 
 # read configuration from YAML files
@@ -19,20 +20,26 @@ clus = yaml_reader.load(c)
 
 if doc['output_path']:
     outpath = doc['output_path']
+    os.makedirs(outpath, exist_ok=True)
+    if outpath[-1] not in ['/', '\\']:
+        outpath += '/'
 else:
     outpath = ''
 
 if clus['cluster_files']:
     cluspath = clus['cluster_files']
+    os.makedirs(cluspath, exist_ok=True)
+    if cluspath[-1] not in ['/', '\\']:
+        cluspath += '/'
 else:
-    cluspath = ''
+    cluspath = outpath
 
 if clus['emails']:
     mail = 'ALL'
 else:
     mail = 'NONE'
 
-expressionpath = doc['expressionpath']
+expressionfile = doc['expressionfile']
 
 if __name__ == '__main__':
     print('writing cluster scripts')
@@ -40,7 +47,7 @@ if __name__ == '__main__':
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:
-        genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
+        genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
         gene_conditions = genes.columns.to_list()
 
     for i, condition in enumerate(gene_conditions):
@@ -96,7 +103,8 @@ if __name__ == '__main__':
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
             f.write('\npython utilities_cluster/cluster_concat_rxn_solutions.py\n'
-                    'python utilities_cluster/cluster_final_network.py'
+                    'python utilities_cluster/cluster_final_1.py\n'
+                    'python utilities_cluster/cluster_final_2.py'
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
 
     elif clus['approach'] == 'separate':
@@ -156,7 +164,8 @@ if __name__ == '__main__':
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
-            f.write('\npython utilities_cluster/cluster_final_network.py'
+            f.write('\npython utilities_cluster/cluster_final_1.py'
+                    '\npython utilities_cluster/cluster_final_2.py'
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
     else:
         warn("Could not identify approach")

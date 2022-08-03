@@ -4,10 +4,15 @@ from cobra.io import write_sbml_model
 from dexom_python import read_model, check_model_options
 
 
-def mba(model_keep, enum_solutions, essential_reactions):
-
-    enum_solutions.columns = [r.id for r in model_keep.reactions]
-    frequencies = enum_solutions.sum().sort_values(ascending=False)
+def mba(model_keep, frequency_table, essential_reactions):
+    frequencies = None
+    if isinstance(frequency_table, pd.Series):
+        frequencies = frequency_table.sort_values(ascending=False)
+    elif isinstance(frequency_table, pd.DataFrame):
+        frequencies = frequency_table[frequency_table.columns[0]].sort_values(ascending=False)
+    else:
+        TypeError('parameter "frequency_table" must be of type pandas.Series or pandas.DataFrame. '
+                  'Received type %s instead' % type(frequency_table))
     vals = list(set(frequencies.values))
     vals.sort(reverse=True)
 
@@ -96,10 +101,11 @@ def mba(model_keep, enum_solutions, essential_reactions):
 if __name__ == "__main__":
     m = read_model("pilot_data/Human-GEM11.xml")
     check_model_options(m, feasibility=1e-6)
-    sols = pd.read_csv("../pilot_data/dexom_solutions.csv", index_col=0)
+    sols = pd.read_csv("pilot_data/dexom_solutions.csv", index_col=0)
+    freq = sols.sum()
 
     rxns = ["MAR09931"]
     m.reactions.get_by_id("MAR09931").upper_bound = 1000.
 
-    new_model = mba(model_keep=m, enum_solutions=sols, essential_reactions=rxns)
+    new_model = mba(model_keep=m,  frequency_table=freq, essential_reactions=rxns)
     write_sbml_model(new_model, "../new_mba_model.xml")

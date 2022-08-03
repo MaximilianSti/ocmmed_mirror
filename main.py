@@ -7,6 +7,7 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.minimal import mba
 from utilities.inactive_pathways import compute_inactive_pathways
 from warnings import warn
+import os
 
 
 # read configuration from YAML files
@@ -21,6 +22,9 @@ params = yaml_reader.load(b)
 
 if doc['output_path']:
     outpath = doc['output_path']
+    os.makedirs(outpath, exist_ok=True)
+    if outpath[-1] not in ['/', '\\']:
+        outpath += '/'
 else:
     outpath = ''
 
@@ -31,7 +35,7 @@ rp = params['rxn_enum_params']
 dp = params['div_enum_params']
 
 modelpath = doc['modelpath']
-expressionpath = doc['expressionpath']
+expressionfile = doc['expressionfile']
 
 
 if __name__ == '__main__':
@@ -42,7 +46,7 @@ if __name__ == '__main__':
     new_model = model_keep.copy()
 
     # read and process gene expression file
-    genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:
@@ -75,7 +79,8 @@ if __name__ == '__main__':
         if doc['force_flux_bounds']:
             force_reaction_bounds(model, doc['force_flux_bounds'])
         try:
-            imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'], threshold=ip['threshold'])
+            imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
+                                        threshold=ip['threshold'])
         except optlang.exceptions.SolverError:
             warn('Solver could not find a solution with forced active reactions. '
                   'Attempting to find a solution without forced flux.')
@@ -101,8 +106,9 @@ if __name__ == '__main__':
         else:
             reactions = [r.id for r in model.reactions]
             rxnlist = reactions[:doc['rxn_enum_iterations']]
-        rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxnlist,
-                                                      obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
+        rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
+                                                      rxn_list=rxnlist,obj_tol=ep['objective_tolerance'],
+                                                      eps=ip['epsilon'], thr=ip['threshold'])
         uniques = pd.DataFrame(rxnsol.unique_binary)
         uniques.to_csv(outpath+'rxn_enum_solutions_%s.csv' % condition)
         print("length reaction-enumeration solution:", len(uniques))
@@ -127,7 +133,7 @@ if __name__ == '__main__':
         rem_rxns = dexom_sols.columns[frequencies == 0].to_list()  # remove reactions which are active in zero solutions
         new_model.remove_reactions(rem_rxns, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
-        new_model = mba(model_keep=new_model, enum_solutions=dexom_sols, essential_reactions=doc['active_reactions'])
+        new_model = mba(model_keep=new_model, frequency_table=frequencies, essential_reactions=doc['active_reactions'])
     else:
         warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     new_model.id += '_cellspecific'

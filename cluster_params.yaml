@@ -1,7 +1,8 @@
 
-cluster_files: cluster_files/
-# path where various files will be saved for the cluster computation
-# recommendation: use 2 different registries for cluster_files and output_path
+cluster_files: cluster_files
+# path to a folder where various files will be saved for the cluster computation
+# if the folder does not exist, it will be created
+# recommendation: use 2 different folders for cluster_files and output_path
 
 batch_num: 5
 # number of parallel batches for each condition
@@ -10,7 +11,7 @@ batch_rxn_sols: 10
 batch_div_sols: 10
 # number of diversity-enum solutions per batch
 
-approach: separate
+approach: grouped
 # which parallelization approach to use on the slurm cluster
 # either 'grouped' or 'separate'
 # if 'grouped': within each batch, several reaction-enum and div-enum solutions will be computed,

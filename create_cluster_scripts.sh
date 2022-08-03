@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=NONE
 #SBATCH -J create_cluster_scripts
 #SBATCH -o create_cluster_scripts_out.out
 #SBATCH -e create_cluster_scripts_err.out

@@ -19,21 +19,25 @@ clus = yaml_reader.load(c)
 
 if doc['output_path']:
     outpath = doc['output_path']
+    if outpath[-1] not in ['/', '\\']:
+        outpath += '/'
 else:
     outpath = ''
 
 if clus['cluster_files']:
     cluspath = clus['cluster_files']
+    if cluspath[-1] not in ['/', '\\']:
+        cluspath += '/'
 else:
     cluspath = outpath
 
-expressionpath = doc['expressionpath']
+expressionfile = doc['expressionfile']
 cobra_config = Configuration()
-cobra_config.solver = 'gurobi'
+cobra_config.solver = 'cplex'
 
 
 if __name__ == '__main__':
-    genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:
@@ -54,20 +58,8 @@ if __name__ == '__main__':
     dex = pd.concat(all_sols).drop_duplicates(ignore_index=True)
     dex.to_csv(outpath + 'all_DEXOM_solutions.csv')
     print("concatenated all DEXOM solutions")
-    model = dexom_python.read_model(doc['modelpath'], solver='gurobi')
+    model = dexom_python.read_model(doc['modelpath'], solver='cplex')
     dex.columns = [r.id for r in model.reactions]
     frequencies = dex.sum()
     frequencies.columns = ['frequency']
     frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
-    print("saved frequencies")
-    if doc['final_network'] == 'union':
-        rem_rxns = dex.columns[frequencies == 0].to_list()  # remove reactions which are active in zero solutions
-        model.remove_reactions(rem_rxns, remove_orphans=True)
-    elif doc['final_network'] == 'minimal':
-        model = mba(model_keep=model, enum_solutions=dex, essential_reactions=doc['active_reactions'])
-    else:
-        warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
-    model.id += '_cellspecific'
-    print('number of reactions in the model:', len(model.reactions))
-    write_sbml_model(model, outpath+'cellspecific_model.xml')
-    compute_inactive_pathways(model)

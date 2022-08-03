@@ -3,10 +3,11 @@
 
 modelpath: pilot_data/Human-GEM11.xml
 # must be a valid cobrapy model (either .xml, .json, or .mat)
-expressionpath: pilot_data/gene_IDs_meanvalues.csv
+expressionfile: pilot_data/gene_IDs_meanvalues.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
-output_path: pilot_data_results/
-# if this path contains a '/', then it must be an existing folder
+output_path: pilot_data_results
+# path to a folder in which the output files will be saved. If the folder does not exist, it will be created
+
 
 ### these parameters are for the gene expression file
 
@@ -32,6 +33,7 @@ reaction_scores: false
 # set this to true if the "gene expression file" already contains reaction identifiers instead of gene identifiers.
 # If true, the conversion of gene expression to reaction weights will be skipped, and the provided scores will be mapped directly on the reactions.
 
+
 ### these parameters are for the network enumeration
 
 force_active_reactions: true
@@ -49,6 +51,7 @@ force_flux_bounds:
 rxn_enum_iterations: 3
 div_enum_iterations: 3
 # number of iterations for reaction-enum and diversity-enum (if using the main.py script)
+
 
 ### these parameters are for the network computation in the final step
 

@@ -17,6 +17,8 @@ params = yaml_reader.load(b)
 
 if doc['output_path']:
     outpath = doc['output_path']
+    if outpath[-1] not in ['/', '\\']:
+        outpath += '/'
 else:
     outpath = ''
 
@@ -25,7 +27,7 @@ ip = params['imat_params']
 ep = params['enum_params']
 
 modelpath = doc['modelpath']
-expressionpath = doc['expressionpath']
+expressionfile = doc['expressionfile']
 
 
 if __name__ == '__main__':
@@ -33,17 +35,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-c', '--condition', help='column of the gene expression file containing the data for one condition')
     args = parser.parse_args()
-    # read tests
+    # read model
     model = dexom_python.read_model(modelpath, solver=mp['solver'])
     model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
     # read and process gene expression file
-    genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
     if doc['gpr_parameters']['qualitative'] and not doc['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=[condition],
                                                     proportion=doc['gpr_parameters']['percentile'],
-                                                    outpath=outpath+'geneweights_qualitative')
+                                                    outpath=outpath+'geneweights_qualitative_%s' % condition)
     # create reaction weights from gene expression
     print('computing reaction weights for condition '+condition)
     gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)

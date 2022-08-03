@@ -14,15 +14,19 @@ clus = yaml_reader.load(c)
 
 if doc['output_path']:
     outpath = doc['output_path']
+    if outpath[-1] not in ['/', '\\']:
+        outpath += '/'
 else:
     outpath = ''
 
 if clus['cluster_files']:
     cluspath = clus['cluster_files']
+    if cluspath[-1] not in ['/', '\\']:
+        cluspath += '/'
 else:
     cluspath = outpath
 
-expressionpath = doc['expressionpath']
+expressionfile = doc['expressionfile']
 
 
 if __name__ == '__main__':
@@ -30,7 +34,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
-    genes = pd.read_csv(expressionpath).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:

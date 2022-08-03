@@ -20,11 +20,15 @@ clus = yaml_reader.load(c)
 
 if doc['output_path']:
     outpath = doc['output_path']
+    if outpath[-1] not in ['/', '\\']:
+        outpath += '/'
 else:
     outpath = ''
 
 if clus['cluster_files']:
     cluspath = clus['cluster_files']
+    if cluspath[-1] not in ['/', '\\']:
+        cluspath += '/'
 else:
     cluspath = outpath
 

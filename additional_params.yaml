@@ -1,5 +1,6 @@
 
 ### This file contains parameters which can be modified if needed
+# parameters with the tag OPTIONAL can be left empty if the file is not present
 
 model_params:
   solver: cplex
@@ -12,7 +13,7 @@ model_params:
   mipgaptol: 1e-3
   # solver MIP gap tolerance. Affects the speed of the solver
   verbosity: 1
-  # solver verbosity (1 for no solver output, 2 to display warnings, 3 for full solver output)
+  # solver verbosity (1 for no solver output, 2 for warnings, 3 for full solver output)
 
 imat_params:
   epsilon: 1e-2
@@ -27,6 +28,7 @@ enum_params:
 
 rxn_enum_params:
   reaction_list: pilot_data/HumanGEM11_reactions_shuffled.csv
+  # OPTIONAL
   # providing a shuffled list of reactions can reduce possible bias in the reaction-enumeration method
   # if left empty, the reactions will be used in the order in which they are in the network
 
@@ -41,5 +43,6 @@ div_enum_params:
   # This very significantly increases the computation time per iteration and should only be done on small models
 
 blocked_rxns: pilot_data/human-gem11_blocked.txt
-# Optional: provide a list of reactions which are blocked in the model.
+# OPTIONAL
+# provide a list of reactions which are blocked in the model.
 # This will be used for determining which reactions are inactive in the cell-specific model
