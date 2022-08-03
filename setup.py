@@ -25,6 +25,6 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://forgemia.inra.fr/metexplore/cbm/ocmmed',
-    python_requires=">=3.7",
+    python_requires=">=3.7,<3.10",
 )
 sys.path.append('ocmmed')

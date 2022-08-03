@@ -2,14 +2,16 @@
 Obtaining cell-specific metabolic models through enumeration with DEXOM
 
 ## Requirements
-- Python 3.7+
-- cplex 12.10+
+- Python 3.7 - 3.9
+- cplex 12.10 - 22.10
 - python packages in the `requirements.txt` file
 
 ## Installation
+The repository can be cloned with `git clone https://forgemia.inra.fr/metexplore/cbm/ocmmed.git` and installed with `python setup.py install`
+
 For the installation of the cluster pipeline, see [cluster instructions file](cluster_instructions.md).
 
-For installing CPLEX on your own computer, see the instructions in the dexom-python package: https://pypi.org/project/dexom-python/
+For installing CPLEX on your own computer, detailed instructions are in the dexom-python package: https://pypi.org/project/dexom-python/  
 
 ## Parameters
 The `parameters.yaml` file contains the main parameters, including the path to the metabolic model and the path to the gene expression file  

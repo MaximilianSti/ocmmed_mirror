@@ -16,4 +16,4 @@ source env/bin/activate
 
 pip install --upgrade pip
 pip install dexom-python
-pip install miom[all]
+pip install miom[full]

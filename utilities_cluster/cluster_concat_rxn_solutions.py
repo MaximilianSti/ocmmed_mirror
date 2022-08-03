@@ -2,6 +2,7 @@ import ruamel.yaml as yaml
 import pandas as pd
 import argparse
 from pathlib import Path
+import os
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -15,14 +16,14 @@ clus = yaml_reader.load(c)
 if doc['output_path']:
     outpath = doc['output_path']
     if outpath[-1] not in ['/', '\\']:
-        outpath += '/'
+        outpath += os.sep
 else:
     outpath = ''
 
 if clus['cluster_files']:
     cluspath = clus['cluster_files']
     if cluspath[-1] not in ['/', '\\']:
-        cluspath += '/'
+        cluspath += os.sep
 else:
     cluspath = outpath
 
