@@ -71,6 +71,16 @@ if __name__ == '__main__':
             reactions = [r.id for r in model.reactions]
     else:
         reactions = [r.id for r in model.reactions]
+    if params['blocked_rxns']:
+        with open(params['blocked_rxns']) as file:
+            reader = file.read()
+        if '\n' in reader:
+            rxns_inactive = set(reader.split('\n'))
+        elif ';' in reader:
+            rxns_inactive = set(reader.split(';'))
+        else:
+            rxns_inactive = set(reader.split(','))
+        reactions = list(set(reactions) - rxns_inactive)
     rxn_range = args.rxn_range.split('_')
     if rxn_range[0] == '':
         start = 0

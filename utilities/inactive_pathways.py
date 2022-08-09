@@ -30,7 +30,7 @@ def compute_inactive_pathways(model):
     rxns_cell = set([r.id for r in model.reactions])
     rxns_full = set([r.id for r in fullmodel.reactions])
     if params['blocked_rxns']:
-        with open('pilot_data/human-gem11_blocked.txt') as file:
+        with open(params['blocked_rxns']) as file:
             reader = file.read()
         if '\n' in reader:
             rxns_inactive = set(reader.split('\n'))

@@ -1,3 +1,4 @@
+import pandas as pd
 
 
 def force_active_rxns(model, rxnlist, fluxvalue=0.1):
@@ -28,7 +29,27 @@ def force_active_rxns(model, rxnlist, fluxvalue=0.1):
             print('reaction %s is blocked in this model, upper bound was set to 1000' % rid)
 
 
-def force_reaction_bounds(model, rxndict):
+def force_reaction_bounds(model, rxnbounds):
+    if isinstance(rxnbounds, dict):
+        rxndict = rxnbounds
+    elif isinstance(rxnbounds, str):
+        rxndict = {}
+        with open(rxnbounds, 'r') as file:
+            reader = file.read()
+        rows = reader.split('\n')
+        for row in rows:
+            if '\t' in row:
+                temp = row.split('\t')
+            elif ';' in row:
+                temp = row.split(';')
+            elif ',' in row:
+                temp = row.split(',')
+            else:  # if none of the previous separators are found, we assume that a simple space is used
+                temp = row.split()
+            rxndict[temp[0]] = ','.join(temp[1:])
+    else:
+        raise TypeError('Wrong type for parameter rxnbounds. Expected either dict or str, got %s instead.'
+                        % type(rxnbounds))
     for rid in rxndict.keys():
         reaction = model.reactions.get_by_id(rid)
         bounds = [float(x.strip()) for x in rxndict[rid].split(',')]
