@@ -12,8 +12,10 @@
 ## Installation instructions
 
 The `cluster_install.sh` file contains the commands for downloading and installing OCMMED on a slurm cluster.  
-Copy this file to your working directory on the slurm cluster, then run the command `sbatch cluster_install.sh`.    
-Below is an explanation of the commands that are used in this script.
+Copy this file to your working directory on the slurm cluster, then run the command `sbatch cluster_install.sh`   
+If you get the following error: `sbatch: error: Batch script contains DOS line breaks (\r\n) instead of expected UNIX line breaks (\n).`, you must use the command `dos2unix cluster_install.sh` before running sbatch.
+
+Below is an explanation of the commands that are used in the `cluster_install.sh` script.
 
 ```
 #!/bin/bash  
@@ -22,7 +24,7 @@ Below is an explanation of the commands that are used in this script.
 #SBATCH -o cluster_install_out.out  
 #SBATCH -e cluster_install_err.out  
 ```
-These commands indicate that this is a bash script, and when it is sent to the slurm cluster via the sbatch command, it will create a job with the name "cluster_install" which will write its output to the "cluster_install_out.out" file and any potential errors or warnings into the "cluster_install_err.out" file. The cluster will also send you emails anytime the run starts, ends, or fails.
+These commands indicate that this is a bash script, and when it is sent to the slurm cluster via the sbatch command, it will create a job with the name "cluster_install" which will write its output to the "cluster_install_out.out" file and any potential errors or warnings into the "cluster_install_err.out" file. The cluster will also send you an email anytime the run starts, ends, or fails.
 
 ```
 cd $SLURM_SUBMIT_DIR  
@@ -48,9 +50,9 @@ Here, we create a python virtual environment with the name "env", and we activat
 ```
 pip install --update pip  
 pip install dexom-python  
-pip install miom[all]
+pip install miom[full]
 ```
-These commands upgrade pip and install the necessary packages for the OCMMED pipeline.
+These commands update the package installer for python and then install the necessary packages for the OCMMED pipeline.
 
 ## Installing cplex on the cluster
 For installing cplex, you will need to create an IBM account with an academic email address.  
@@ -70,22 +72,18 @@ You will be taken to a list of downloadable files for different OS. For installi
 
 Check the box(es) next to the download(s) you want, scroll down to the bottom of the page, check "I agree" and click on "Download Now". Your download will open with IBM Download Director (it may ask for permission: select "Yes").
 
-After the download, you will have a .bin file, which you can transfer to the cluster with WinSCP
+After the download, you will have a .bin file, which you can transfer to the cluster.
 
-To run the file, execute the following commands:  
+To run the file, execute the following commands (this example uses CPLEX version 12.10):  
 ```
 chmod +x cplex_studio1210.linux-x86-64.bin
-
 ./cplex_studio1210.linux-x86-64.bin
 ```
-During the installation, you will be asked to specify a path. You must select a path that you have permission for (for example in my case `/home/username/save/CPLEX`)
+During the installation, you will be asked to specify a path. You must select a path in which you have permission and enough space to install the software (for example in my case `/home/username/save/CPLEX`)
 
 
 ## Setting parameters
 - Modify the necessary parameters in `parameters.yaml`.
-
-In particular, make sure that the `output_path` parameter is an existing folder in the ocmmed diretory (Or leave empty if you want to save results directly in the ocmmed folder).  
-If the folder doesn't exist, you will get an error when the program tries to save its results.  
 
 - Modifying the parameters in `additional_params.yaml` is optional. 
 
@@ -94,8 +92,7 @@ If your iterations take very long and often hit the timelimit, you may want to s
 - Modify the parameters in `cluster_params.yaml`
 
 If, during the installation, you modified the path to the python module `system/Python-3.7.4`, then you must also modify the `pythonpath` parameter  
-The `cluster_files` parameter must also be an existing folder in the ocmmed directory.  
-It's recommended to use a separate folder for the cluster files, as the program will create many files which are not necessary to keep after the run is finished.
+For the `cluster_files` parameter, I recommended using a different folder than `output_path`, as the program will create many files which are not necessary to keep after the run is finished.
 
 Note that on the cluster, the `rxn_enum_iterations` and `div_enum_iterations` parameters in the `parameters.yaml` file are ignored.  
 Instead, you must use the `batch_num`, `batch_rxn_sols` and `batch_div_sols` parameters in the `cluster_params.yaml` file to set the number of iterations.
@@ -193,9 +190,11 @@ The total number of newly created files is: num_conditions * (num_batches * 4 + 
 - **in output_path:**  
     - all_DEXOM_solutions.csv  
     - activation_frequency_reactions.csv  
-    - cellspecific_model.xml  
+    - cellspecific_model.xml
+    - inactive_pathways.csv
+    - inactive_pathways_relative.csv
 
-The total number of newly created files is: num_conditions * 2 + 3  
+The total number of newly created files is: num_conditions * 2 + 5  
 
 ### approach: grouped
 **cluster_script_2**  
@@ -222,5 +221,7 @@ The total number of newly created files is: num_conditions * (num_batches * 5 + 
     - all_DEXOM_solutions.csv  
     - activation_frequency_reactions.csv  
     - cellspecific_model.xml  
+    - inactive_pathways.csv
+    - inactive_pathways_relative.csv
 
-The total number of newly created files is: num_conditions * 3 + 3  
+The total number of newly created files is: num_conditions * 3 + 5  

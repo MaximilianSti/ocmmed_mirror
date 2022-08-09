@@ -1,2 +1,2 @@
-dexom_python>=0.3
-miom[full]
+dexom_python>=0.4
+miom[all]

@@ -11,7 +11,7 @@ output_path: pilot_data_results
 
 ### these parameters are for the gene expression file
 
-gene_ID_column: ID
+gene_ID_column: gene_IDs
 # name of the column containing gene IDs
 gene_expression_columns:
 # names of the columns containing gene expression data

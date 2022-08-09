@@ -11,3 +11,5 @@ module load system/Python-3.7.4
 source env/bin/activate
 
 python create_cluster_scripts.py
+
+echo "finished creating cluster scripts"
