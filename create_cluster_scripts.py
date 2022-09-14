@@ -103,8 +103,7 @@ if __name__ == '__main__':
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
             f.write('\npython utilities_cluster/cluster_concat_rxn_solutions.py\n'
-                    'python utilities_cluster/cluster_final_1.py\npython utilities_cluster/cluster_final_2.py'
-                    ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
+                    'python utilities_cluster/cluster_final_1.py\npython utilities_cluster/cluster_final_2.py')
 
     elif clus['approach'] == 'separate':
         for i, condition in enumerate(gene_conditions):

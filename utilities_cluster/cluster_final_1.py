@@ -2,10 +2,6 @@ import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
 from pathlib import Path
-from warnings import warn
-from utilities.minimal import mba
-from utilities.inactive_pathways import compute_inactive_pathways
-from cobra.io import write_sbml_model
 from cobra import Configuration
 import os
 
