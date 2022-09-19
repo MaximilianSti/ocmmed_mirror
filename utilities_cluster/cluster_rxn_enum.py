@@ -95,9 +95,5 @@ if __name__ == '__main__':
     rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
                                                   obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
     uniques = pd.DataFrame(rxnsol.unique_binary)
+    uniques.columns = [r.id for r in model.reactions]
     uniques.to_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
-
-    # if clus['approach'] == 'grouped':
-    #     for i in range(1, len(rxnsol.unique_solutions)):
-    #         dexom_python.write_solution(model, rxnsol.unique_solutions[i], ip['threshold'], clus['cluster_files']
-    #                                     +'rxn_enum_solution_%s_%s_%i.csv' % (condition, args.parallel_id, i))

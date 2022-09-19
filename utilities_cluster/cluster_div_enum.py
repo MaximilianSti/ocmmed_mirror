@@ -83,5 +83,6 @@ if __name__ == '__main__':
                                 maxiter=args.maxiter, obj_tol=ep['objective_tolerance'], full=dp['full'])
 
     solutions = pd.DataFrame(divsol.binary)
+    solutions.columns = [r.id for r in model.reactions]
     solutions.to_csv(cluspath + 'div_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
     divres.to_csv(cluspath + 'div_enum_stats_%s_%s.csv' % (condition, args.parallel_id))
