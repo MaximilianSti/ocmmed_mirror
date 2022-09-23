@@ -11,7 +11,7 @@ batch_rxn_sols: 10
 batch_div_sols: 10
 # number of diversity-enum solutions per batch
 
-approach: grouped
+approach: separate
 # which parallelization approach to use on the slurm cluster
 # either 'grouped' or 'separate'
 # if 'grouped': within each batch, several reaction-enum and div-enum solutions will be computed,
@@ -26,7 +26,7 @@ cores: 24
 # number of cores to assign for each job
 memory: 64
 # allocated memory per job in gigabytes
-time: 10:00:00
+time: 12:00:00
 # maximum allowed runtime per job in hours:minutes:seconds
 pythonpath: system/Python-3.7.4
 # path where the python module is located on the cluster

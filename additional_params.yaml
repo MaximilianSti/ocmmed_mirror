@@ -16,9 +16,9 @@ model_params:
   # solver verbosity (1 for no solver output, 2 for warnings, 3 for full solver output)
 
 imat_params:
-  epsilon: 1e-2
+  epsilon: 1e-4
   # minimum flux value for reactions associated with highly expressed genes
-  threshold: 1e-5
+  threshold: 1e-4
   # threshold for determining whether a reaction is active or inactive (must be greater than solver feasibility)
 
 enum_params:
