@@ -54,8 +54,7 @@ if __name__ == '__main__':
         with open(cluspath+'imat_%i.sh' % i, 'w+') as f:
             f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J imat_{s}\n#SBATCH -c {c}\n#SBATCH --mem={m}G\n'
                     '#SBATCH -t {t}\n#SBATCH -o {p}imat_{s}_out.out\n#SBATCH -e {p}imat_{s}_err.out\n'
-                    ''.format(s=condition, c=clus['cores'], m=clus['memory'], py=clus['pythonpath'], t=clus['time'],
-                              p=cluspath, e=mail))
+                    ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], p=cluspath, e=mail))
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
                     (clus['pythonpath'], clus['envpath'], clus['cplexpath']))

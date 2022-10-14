@@ -5,6 +5,7 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 import os
+from optlang import cplex_interface
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -39,6 +40,7 @@ ep = params['enum_params']
 rp = params['rxn_enum_params']
 
 modelpath = doc['modelpath']
+
 
 if __name__ == '__main__':
     description = 'For a given condition, performs reaction-enumeration'
@@ -92,8 +94,19 @@ if __name__ == '__main__':
         rxn_list = reactions[start:]
     else:
         rxn_list = reactions[start:int(rxn_range[1])]
-    rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
-                                                  obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
+
+    solver_ready = True
+    if clus['force_cplex'] and model.solver.interface is not cplex_interface:
+        solver_ready = False
+
+    if solver_ready:
+        rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
+                                                      obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
+    else:
+        warn("cplex wasn't properly installed, try again")
+        with open(cluspath + 'rxn_enum_ERROR_%s_%s.txt' % (condition, args.parallel_id), 'w+') as file:
+            file.write('no cplex')
+
     uniques = pd.DataFrame(rxnsol.unique_binary)
     uniques.columns = [r.id for r in model.reactions]
     uniques.to_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))

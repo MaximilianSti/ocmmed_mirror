@@ -5,6 +5,7 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 import os
+from optlang import cplex_interface
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -78,11 +79,19 @@ if __name__ == '__main__':
     else:
         distanneal = dp['dist_anneal']
 
-    divsol, divres = dexom_python.enum_functions.diversity_enum(model=model, reaction_weights=rw, prev_sol=prevsol,
-                                dist_anneal=distanneal, eps=ip['epsilon'], thr=ip['threshold'], icut=dp['icut'],
-                                maxiter=args.maxiter, obj_tol=ep['objective_tolerance'], full=dp['full'])
+    solver_ready = True
+    if clus['force_cplex'] and model.solver.interface is not cplex_interface:
+        solver_ready = False
 
-    solutions = pd.DataFrame(divsol.binary)
-    solutions.columns = [r.id for r in model.reactions]
-    solutions.to_csv(cluspath + 'div_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
-    divres.to_csv(cluspath + 'div_enum_stats_%s_%s.csv' % (condition, args.parallel_id))
+    if solver_ready:
+        divsol, divres = dexom_python.enum_functions.diversity_enum(model=model, reaction_weights=rw, prev_sol=prevsol,
+                                    dist_anneal=distanneal, eps=ip['epsilon'], thr=ip['threshold'], icut=dp['icut'],
+                                    maxiter=args.maxiter, obj_tol=ep['objective_tolerance'], full=dp['full'])
+        solutions = pd.DataFrame(divsol.binary)
+        solutions.columns = [r.id for r in model.reactions]
+        solutions.to_csv(cluspath + 'div_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
+        divres.to_csv(cluspath + 'div_enum_stats_%s_%s.csv' % (condition, args.parallel_id))
+    else:
+        warn("cplex wasn't properly installed, try again")
+        with open(cluspath + 'div_enum_ERROR_%s_%s.txt' % (condition, args.parallel_id), 'w+') as file:
+            file.write('no cplex')
