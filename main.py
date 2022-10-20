@@ -23,7 +23,7 @@ if doc['output_path']:
     outpath = doc['output_path']
     os.makedirs(outpath, exist_ok=True)
     if outpath[-1] not in ['/', '\\']:
-        outpath += os.sep
+        outpath += '/'
 else:
     outpath = ''
 

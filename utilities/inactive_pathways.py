@@ -16,7 +16,7 @@ params = yaml_reader.load(b)
 if doc['output_path']:
     outpath = doc['output_path']
     if outpath[-1] not in ['/', '\\']:
-        outpath += os.sep
+        outpath += '/'
 else:
     outpath = ''
 modelpath = doc['modelpath']

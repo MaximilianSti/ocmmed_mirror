@@ -23,7 +23,7 @@ clus = yaml_reader.load(c)
 if doc['output_path']:
     outpath = doc['output_path']
     if outpath[-1] not in ['/', '\\']:
-        outpath += os.sep
+        outpath += '/'
 else:
     outpath = ''
 
