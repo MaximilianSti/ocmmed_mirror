@@ -11,7 +11,7 @@ output_path: pilot_data_results
 
 ### these parameters are for the gene expression file
 
-gene_ID_column: gene_IDs
+gene_ID_column: ID
 # name of the column containing gene IDs
 gene_expression_columns:
 # names of the columns containing gene expression data
@@ -33,20 +33,21 @@ reaction_scores: false
 # set this to true if the "gene expression file" already contains reaction identifiers instead of gene identifiers.
 # If true, the conversion of gene expression to reaction weights will be skipped, and the provided scores will be mapped directly on the reactions.
 
+force_flux_bounds:
+  MAR09931: 1e-4, 1000
+# manually define the lower and upper flux bounds for some reactions
+# this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
+
+force_active_reactions:
+  examplereaction
+# manually define reactions that must carry flux, and their minimum flux value
+# particularly useful for reversible reactions that could carry flux in either direction
+# this can also be a text file containing reaction ideas
+fluxvalue: 1e-4
+# 'fluxvalue' is the absolute value that the minimal flux should have
+
 
 ### these parameters are for the network enumeration
-
-force_active_reactions: true
-# define whether some reactions in the model should be forced to carry flux
-active_reactions: # use the reaction IDs from the model to define the reactions which must carry flux
-#  - MAR13082 # this is the generic biomass reaction for human1
-  - MAR09931 # this is the biomass maintenance reaction with upper bound 0
-fluxvalue: 1e-4
-# minimum value that the flux should have.
-
-force_flux_bounds:
-#  MAR03905: 0,1000
-# manually define the lower and upper flux bounds for some reactions
 
 rxn_enum_iterations: 3
 div_enum_iterations: 3

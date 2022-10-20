@@ -2,11 +2,10 @@ import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
 from cobra.io import write_sbml_model
-import optlang
 from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.minimal import mba
 from utilities.inactive_pathways import compute_inactive_pathways
-from warnings import warn
+from warnings import warn, catch_warnings, filterwarnings, resetwarnings
 import os
 
 
@@ -44,7 +43,10 @@ if __name__ == '__main__':
     model_keep = dexom_python.check_model_options(model_keep, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
                                                   mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     new_model = model_keep.copy()
-
+    if doc['force_active_reactions']:
+        force_active_rxns(new_model, doc['force_active_reactions'], doc['fluxvalue'])
+    if doc['force_flux_bounds']:
+        force_reaction_bounds(new_model, doc['force_flux_bounds'])
     # read and process gene expression file
     genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
     if doc['gene_expression_columns']:
@@ -74,22 +76,21 @@ if __name__ == '__main__':
         # compute imat solution from reaction weights
         print('performing iMAT for condition ' + condition)
         model = new_model.copy()
-        if doc['force_active_reactions']:
-            force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
-        if doc['force_flux_bounds']:
-            force_reaction_bounds(model, doc['force_flux_bounds'])
-        try:
-            imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
-                                        threshold=ip['threshold'])
-        except optlang.exceptions.SolverError:
-            warn('Solver could not find a solution with forced active reactions. '
-                  'Attempting to find a solution without forced flux.')
-            model = model_keep.copy()
-            imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
-                                        threshold=ip['threshold'])
-            print('The solver could not find a solution with forced active reactions, '
-                  'but found one without forcing flux through the selected reactions. '
-                  'Check if any of the reactions in the "active_reactions" list are blocked ')
+        with catch_warnings():
+            filterwarnings('error')
+            try:
+                imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
+                                            threshold=ip['threshold'])
+            except UserWarning:
+                resetwarnings()
+                warn('Solver could not find a solution with forced active reactions. '
+                      'Attempting to find a solution without forced flux.')
+                model = model_keep.copy()
+                imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
+                                            threshold=ip['threshold'])
+                print('The solver could not find a solution with forced active reactions, '
+                      'but found one without forcing flux through the selected reactions. '
+                      'Check if any of the reactions in the "active_reactions" list are blocked ')
         dexom_python.write_solution(model=model, solution=imatsol, threshold=ip['threshold'],
                                     filename=outpath+'imat_solution_%s.csv' % condition)
 
@@ -98,14 +99,21 @@ if __name__ == '__main__':
         if rp['reaction_list']:
             df = pd.read_csv(rp['reaction_list'], header=None)
             reactions = [x for x in df.unstack().values]
-            if False in [rid in model.reactions for rid in reactions]:
-                warn('One or more of the reactions in "reaction_list" are not present in the model. '
-                     'The provided reaction list will not be used.')
-                reactions = [r.id for r in model.reactions]
-            rxnlist = reactions[:doc['rxn_enum_iterations']]
+            wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
+            for rid in wrongrids:
+                warn('reaction %s is not in the model, this reaction will be skipped' % rid)
+            reactions = list(set(reactions) - set(wrongrids))
         else:
             reactions = [r.id for r in model.reactions]
-            rxnlist = reactions[:doc['rxn_enum_iterations']]
+        if params['blocked_rxns']:
+            seps = ['\t', ';', ',', '\n']  # list of potential separators for the file
+            with open(params['blocked_rxns']) as file:
+                reader = file.read()
+            for sep in seps:
+                reader = reader.replace(sep, ' ')
+            rxns_inactive = reader.split()
+            reactions = list(set(reactions) - set(rxns_inactive))
+        rxnlist = reactions[:doc['rxn_enum_iterations']]
         rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
                                                       rxn_list=rxnlist,obj_tol=ep['objective_tolerance'],
                                                       eps=ip['epsilon'], thr=ip['threshold'])
@@ -133,7 +141,7 @@ if __name__ == '__main__':
         rem_rxns = dexom_sols.columns[frequencies == 0].to_list()  # remove reactions which are active in zero solutions
         new_model.remove_reactions(rem_rxns, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
-        new_model = mba(model_keep=new_model, frequency_table=frequencies, essential_reactions=doc['active_reactions'])
+        new_model = mba(model_keep=new_model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
     else:
         warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     new_model.id += '_cellspecific'

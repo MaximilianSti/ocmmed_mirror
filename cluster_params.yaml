@@ -26,7 +26,7 @@ cores: 24
 # number of cores to assign for each job
 memory: 64
 # allocated memory per job in gigabytes
-time: 12:00:00
+time: 10:00:00
 # maximum allowed runtime per job in hours:minutes:seconds
 pythonpath: system/Python-3.7.4
 # path where the python module is located on the cluster
@@ -34,3 +34,6 @@ envpath: env
 # path where the python virtual environment is located (by default: in the same registry as this file, in a folder called "env")
 cplexpath: /home/mstingl/save/CPLEX_Studio1210/cplex/python/3.7/x86-64_linux
 # path where the cplex binary is located
+
+force_cplex: True
+# if True, the optimizations will be run only if the cplex solver is available

@@ -45,7 +45,7 @@ if __name__ == '__main__':
         for rxn in rem_rxns:
             model.remove_reactions([rxn], remove_orphans=True)
     elif doc['final_network'] == 'minimal':
-        model = mba(model_keep=model, frequency_table=frequencies, essential_reactions=doc['active_reactions'])
+        model = mba(model_keep=model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
     else:
         warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     model.id += '_cellspecific'

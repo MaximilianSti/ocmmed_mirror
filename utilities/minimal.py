@@ -1,5 +1,6 @@
 import pandas as pd
 import miom
+from warnings import warn
 from cobra.io import write_sbml_model
 from dexom_python import read_model, check_model_options
 
@@ -17,6 +18,10 @@ def mba(model_keep, frequency_table, essential_reactions):
     vals.sort(reverse=True)
 
     allrecs = [r.id for r in model_keep.reactions]
+    wrongrids = [rid for rid in essential_reactions if rid not in allrecs]
+    for rid in wrongrids:
+        warn('essential reaction %s is not in the model, this reaction will be skipped' % rid)
+    essential_reactions = list(set(essential_reactions) - set(wrongrids))
     current_rxns = essential_reactions.copy()
     indexes = []
     newvals = vals

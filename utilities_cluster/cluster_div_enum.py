@@ -5,7 +5,7 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 import os
-from optlang import cplex_interface
+import optlang
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -55,10 +55,10 @@ if __name__ == '__main__':
     model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
-    if doc['force_active_reactions']:
-        force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
     if doc['force_flux_bounds']:
         force_reaction_bounds(model, doc['force_flux_bounds'])
+    if doc['force_active_reactions']:
+        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
     rw = dexom_python.load_reaction_weights(filename=outpath + 'reaction_weights_%s.csv' % condition)
 
     prevsol, prevbin = dexom_python.read_solution(outpath + 'imat_solution_%s.csv' % condition)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         distanneal = dp['dist_anneal']
 
     solver_ready = True
-    if clus['force_cplex'] and model.solver.interface is not cplex_interface:
+    if clus['force_cplex'] and not hasattr(optlang, 'cplex_interface'):
         solver_ready = False
 
     if solver_ready:
@@ -92,6 +92,6 @@ if __name__ == '__main__':
         solutions.to_csv(cluspath + 'div_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
         divres.to_csv(cluspath + 'div_enum_stats_%s_%s.csv' % (condition, args.parallel_id))
     else:
-        warn("cplex wasn't properly installed, try again")
-        with open(cluspath + 'div_enum_ERROR_%s_%s.txt' % (condition, args.parallel_id), 'w+') as file:
-            file.write('no cplex')
+        warn('cplex is not properly installed and the force_cplex parameter is set to True')
+        with open(cluspath + 'div_enum_CPLEXERROR_%s_%s.txt' % (condition, args.parallel_id), 'w+') as file:
+            file.write('cplex is not properly installed and the force_cplex parameter is set to True')

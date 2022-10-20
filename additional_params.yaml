@@ -8,7 +8,7 @@ model_params:
   # see instructions for cplex installation in the dexom_python documentation
   timelimit: 600
   # solver timelimit for each optimization step (in seconds). Leave empty for no timelimit
-  feasibility: 1e-6
+  feasibility: 1e-7
   # solver feasibility tolerance. Affects the speed of the solver
   mipgaptol: 1e-3
   # solver MIP gap tolerance. Affects the speed of the solver

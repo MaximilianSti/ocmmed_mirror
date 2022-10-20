@@ -5,7 +5,7 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 import os
-from optlang import cplex_interface
+import optlang
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -56,10 +56,10 @@ if __name__ == '__main__':
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
 
-    if doc['force_active_reactions']:
-        force_active_rxns(model, doc['active_reactions'], doc['fluxvalue'])
     if doc['force_flux_bounds']:
         force_reaction_bounds(model, doc['force_flux_bounds'])
+    if doc['force_active_reactions']:
+        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
 
     rw = dexom_python.load_reaction_weights(filename=outpath+'reaction_weights_%s.csv' % condition)
     imatsol, imatbin = dexom_python.read_solution(filename=outpath+'imat_solution_%s.csv' % condition)
@@ -67,21 +67,19 @@ if __name__ == '__main__':
     if rp['reaction_list']:
         df = pd.read_csv(rp['reaction_list'], header=None)
         reactions = [x for x in df.unstack().values]
-        if False in [rid in model.reactions for rid in reactions]:
-            warn('One or more of the reactions in "reaction_list" are not present in the model. '
-                 'The provided reaction list will not be used.')
-            reactions = [r.id for r in model.reactions]
+        wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
+        for rid in wrongrids:
+            warn('reaction %s is not in the model, this reaction will be skipped' % rid)
+        reactions = list(set(reactions) - set(wrongrids))
     else:
         reactions = [r.id for r in model.reactions]
     if params['blocked_rxns']:
+        seps = ['\t', ';', ',', '\n']  # list of potential separators for the file
         with open(params['blocked_rxns']) as file:
             reader = file.read()
-        if '\n' in reader:
-            rxns_inactive = set(reader.split('\n'))
-        elif ';' in reader:
-            rxns_inactive = set(reader.split(';'))
-        else:
-            rxns_inactive = set(reader.split(','))
+        for sep in seps:
+            reader = reader.replace(sep, ' ')
+        rxns_inactive = reader.split()
         reactions = list(set(reactions) - rxns_inactive)
     rxn_range = args.rxn_range.split('_')
     if rxn_range[0] == '':
@@ -96,16 +94,17 @@ if __name__ == '__main__':
         rxn_list = reactions[start:int(rxn_range[1])]
 
     solver_ready = True
-    if clus['force_cplex'] and model.solver.interface is not cplex_interface:
+    if clus['force_cplex'] and not hasattr(optlang, 'cplex_interface'):
         solver_ready = False
 
     if solver_ready:
-        rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol, rxn_list=rxn_list,
-                                                      obj_tol=ep['objective_tolerance'], eps=ip['epsilon'], thr=ip['threshold'])
+        rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
+                                                      rxn_list=rxn_list, obj_tol=ep['objective_tolerance'],
+                                                      eps=ip['epsilon'], thr=ip['threshold'])
     else:
-        warn("cplex wasn't properly installed, try again")
-        with open(cluspath + 'rxn_enum_ERROR_%s_%s.txt' % (condition, args.parallel_id), 'w+') as file:
-            file.write('no cplex')
+        warn('cplex is not properly installed and the force_cplex parameter is set to True')
+        with open(cluspath + 'rxn_enum_CPLEXERROR_%s_%s.txt' % (condition, args.parallel_id), 'w+') as file:
+            file.write('cplex is not properly installed and the force_cplex parameter is set to True')
 
     uniques = pd.DataFrame(rxnsol.unique_binary)
     uniques.columns = [r.id for r in model.reactions]
