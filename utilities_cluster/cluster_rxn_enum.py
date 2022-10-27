@@ -80,7 +80,7 @@ if __name__ == '__main__':
         for sep in seps:
             reader = reader.replace(sep, ' ')
         rxns_inactive = reader.split()
-        reactions = list(set(reactions) - rxns_inactive)
+        reactions = list(set(reactions) - set(rxns_inactive))
     rxn_range = args.rxn_range.split('_')
     if rxn_range[0] == '':
         start = 0
