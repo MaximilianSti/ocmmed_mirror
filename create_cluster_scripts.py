@@ -147,12 +147,15 @@ if __name__ == '__main__':
                     '\n    dos2unix {p}rxnenum_"$i".sh\n    sbatch {p}rxnenum_"$i".sh\ndone'
                     ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath, e=mail))
         with open('cluster_script_3.sh', 'w+') as f:
-            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_3\n#SBATCH -o script_3_out.out\n#SBATCH '
-                    '-e script_3_err.out\ncd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load {py}\n'
-                    'source {env}/bin/activate\npython utilities_cluster/cluster_concat_rxn_solutions.py\nfor i in {l}'
+            f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH --mem={m}G\n#SBATCH -c {c}'
+                    '\n#SBATCH -t {t}#SBATCH -J script_3\n#SBATCH -o script_3_out.out\n#SBATCH -e script_3_err.out\n'
+                    ''.format(c=clus['cores'], m=clus['memory'], t=clus['time'], e=mail))
+            f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
+                    'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
+                    (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+            f.write('python utilities_cluster/cluster_concat_rxn_solutions.py\nfor i in {l}'
                     '\ndo\n    dos2unix {p}divenum_"$i".sh\n    sbatch {p}divenum_"$i".sh\ndone'
-                    ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath, py=clus['pythonpath'],
-                              env=clus['envpath'], e=mail))
+                    ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath))
         # write script 4
         with open('cluster_script_4.sh', 'w+') as f:
             f.write('#!/bin/bash\n#SBATCH --mail-type={e}\n#SBATCH -J script_4\n#SBATCH -o script_4_out.out\n#SBATCH '
