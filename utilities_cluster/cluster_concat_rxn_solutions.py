@@ -2,7 +2,8 @@ import ruamel.yaml as yaml
 import pandas as pd
 import argparse
 from pathlib import Path
-import os
+from sklearn.cluster import KMeans
+
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -47,4 +48,15 @@ if __name__ == '__main__':
             sol = pd.read_csv(f, index_col=0)
             solutions.append(sol)
         rxn_sols = pd.concat(solutions).drop_duplicates(ignore_index=True)
-        rxn_sols.to_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition)
+
+        clustering = KMeans(n_clusters=clus['batch_num']).fit(rxn_sols)  # form batch_num kmeans clusters
+        clusterdf = pd.DataFrame(clustering.transform(rxn_sols))
+        sol_index = clusterdf.idxmin().values.tolist()  # we take the solution closest to each cluster center
+        first_pos = list(set(range(10)) - set(sol_index))
+        sol_index = list(set(sol_index) - set(range(10)))
+        rename_dic = {}
+        for i, j in zip(first_pos, sol_index):
+            rename_dic[i] = j
+            rename_dic[j] = i
+        new_sols = rxn_sols.rename(rename_dic).sort_index()  # exchange the first solutions with the center solutions
+        new_sols.to_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition)
