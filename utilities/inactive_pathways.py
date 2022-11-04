@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 from cobra.flux_analysis import find_blocked_reactions
 from cobra import Configuration
-import os
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -39,8 +38,10 @@ def compute_inactive_pathways(model):
         else:
             rxns_inactive = set(reader.split(','))
     else:
-        potential_inactive = [r.id for r in fullmodel if r.id not in model.reactions]
+        rxn_ids = [r.id for r in fullmodel.reactions if r.id not in model.reactions]
+        potential_inactive = [fullmodel.reactions.get_by_id(rid) for rid in rxn_ids]
         if hasattr(fullmodel, "_sbml"):
+            # in some SBML models, the model._sbml['created'] attribute causes a bug in find_blocked_reactions
             fullmodel._sbml['created'] = None
         rxns_inactive = set(find_blocked_reactions(fullmodel, reaction_list=potential_inactive))
     rxns_flux = rxns_full - rxns_inactive
@@ -55,3 +56,8 @@ def compute_inactive_pathways(model):
     paths_rel.sort_values(ascending=False, inplace=True)
     paths_rel.to_csv(outpath + 'inactive_pathways_relative.csv')
     return paths, paths_rel
+
+
+if __name__ == '__main__':
+    model = dexom_python.read_model(outpath+'cellspecific_model.xml')
+    compute_inactive_pathways(model)

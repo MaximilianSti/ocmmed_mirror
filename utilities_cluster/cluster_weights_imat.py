@@ -59,7 +59,7 @@ if __name__ == '__main__':
         rw = {}
         for rxn in model.reactions:
             rw[rxn.id] = float(gene_weights.to_dict().get(rxn.id, 0.))
-        dexom_python.save_reaction_weights(rw, outpath + 'reaction_weights_%s' % condition)
+        dexom_python.save_reaction_weights(rw, outpath + 'reaction_weights_%s.csv' % condition)
     else:
         rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
                                 filename=outpath+'reaction_weights_%s' % condition)
