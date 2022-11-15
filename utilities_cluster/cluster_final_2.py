@@ -49,6 +49,5 @@ if __name__ == '__main__':
     else:
         warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     model.id += '_cellspecific'
-    print('number of reactions in the model:', len(model.reactions))
     write_sbml_model(model, outpath+'cellspecific_model.xml')
     compute_inactive_pathways(model)
