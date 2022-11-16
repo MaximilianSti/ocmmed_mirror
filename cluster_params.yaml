@@ -1,5 +1,5 @@
 
-cluster_files: cluster_files
+cluster_files: pilot_data_cluster_files
 # path to a folder where various files will be saved for the cluster computation
 # if the folder does not exist, it will be created
 # recommendation: use 2 different folders for cluster_files and output_path
