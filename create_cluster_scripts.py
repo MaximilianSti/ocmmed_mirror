@@ -10,11 +10,11 @@ with open('parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
 
-with open('additional_params.yaml', 'r') as file:
+with open('params_additional.yaml', 'r') as file:
     b = file.read()
 params = yaml_reader.load(b)
 
-with open('cluster_params.yaml', 'r') as file:
+with open('params_cluster.yaml', 'r') as file:
     c = file.read()
 clus = yaml_reader.load(c)
 

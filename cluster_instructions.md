@@ -40,7 +40,7 @@ module load system/Python-3.7.4
 ```
 `module purge` deactivates any currently loaded modules.  
 Here, we load a module called `Python-3.7.4` which is installed in the `system` folder of the slurm cluster.   
-If your python distribution is installed elsewhere, or if you are using a different version of python, you must modify this line. (In this case, you must also modify the same line in the `create_cluster_scripts.sh` file, as well as the `pythonmodule` parameter in the `cluster_params.yaml` file)
+If your python distribution is installed elsewhere, or if you are using a different version of python, you must modify this line. (In this case, you must also modify the same line in the `create_cluster_scripts.sh` file, as well as the `pythonmodule` parameter in the `params_cluster.yaml` file)
 
 ```
 python -m venv env  
@@ -87,17 +87,17 @@ During the installation, you will be asked to specify a path. You must select a 
 ## Setting parameters
 - Modify the necessary parameters in `parameters.yaml`.
 
-- Modifying the parameters in `additional_params.yaml` is optional. 
+- Modifying the parameters in `params_additional.yaml` is optional. 
 
 If your iterations take very long and often hit the timelimit, you may want to set a higher `timelimit` or increase one of the tolerance parameters.
 
-- Modify the parameters in `cluster_params.yaml`
+- Modify the parameters in `params_cluster.yaml`
 
 If, during the installation, you modified the path to the python module `system/Python-3.7.4`, then you must also modify the `pythonmodule` parameter  
 For the `cluster_files` parameter, I recommended using a different folder than `output_path`, as the program will create many files which are not necessary to keep after the run is finished.
 
 Note that on the cluster, the `rxn_enum_iterations` and `div_enum_iterations` parameters in the `parameters.yaml` file are ignored.  
-Instead, you must use the `batch_num`, `batch_rxn_sols` and `batch_div_sols` parameters in the `cluster_params.yaml` file to set the number of iterations.
+Instead, you must use the `batch_num`, `batch_rxn_sols` and `batch_div_sols` parameters in the `params_cluster.yaml` file to set the number of iterations.
 
 ## Running the pipeline with snakemake
 

@@ -15,7 +15,7 @@ For installing CPLEX on your own computer, detailed instructions are given in th
 
 ## Parameters
 The `parameters.yaml` file contains the main parameters, including the path to the metabolic model and the path to the gene expression file  
-`additional_params.yaml` contains more optional parameters
+`params_additional.yaml` contains more optional parameters
 
 ## Input files
 The main inputs are:  
@@ -38,6 +38,6 @@ The DEXOM solutions are merged and used to construct the new metabolic model whi
 
 ## Cluster pipeline
 Because the enumeration of multiple solutions with DEXOM can be very slow when using large metabolic networks and/or large transcriptomic datasets, the pipeline has been adapted for use on computation clusters with the snakemake workflow managment tool.  
-Parameters for the cluster pipeline can be found in `cluster_params.yaml`  
+Parameters for the cluster pipeline can be found in `params_cluster.yaml`  
 
 Refer to the [cluster instructions file](cluster_instructions.md) for a detailed explanation of the cluster pipeline.

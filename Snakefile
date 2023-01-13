@@ -1,19 +1,14 @@
-
-def get_conditions():
-    return {CONDITIONS}
-
-def get_parallel():
-    return list(range({BATCH_NUM}))
+include: "snakemake_utils.smk"
 
 rule end:
     input:
-        "{OUT_FOLDER}cellspecific_model.xml"
+        outpath+"cellspecific_model.xml"
 
 rule produce_cellspecific_model:
     input:
-        "{OUT_FOLDER}activation_frequency_reactions.csv"
+        outpath+"activation_frequency_reactions.csv"
     output:
-        "{OUT_FOLDER}cellspecific_model.xml"
+        outpath+"cellspecific_model.xml"
     log:
         "logs/cluster_final_2.log"
     shell:
@@ -21,10 +16,10 @@ rule produce_cellspecific_model:
 
 rule concat_div_sols:
     input:
-        expand("{CLUSTER_FILES}div_enum_solutions_{condition}_{parallel}.csv", condition=get_conditions(), parallel=get_parallel())
+        expand(cluspath+"div_enum_solutions_{condition}_{parallel}.csv", condition=get_conditions(), parallel=get_parallel())
     output:
-        "{OUT_FOLDER}all_DEXOM_solutions.csv",
-        "{OUT_FOLDER}activation_frequency_reactions.csv"
+        outpath+"all_DEXOM_solutions.csv",
+        outpath+"activation_frequency_reactions.csv"
     log:
         "logs/cluster_final_1.log"
     shell:
@@ -32,23 +27,23 @@ rule concat_div_sols:
 
 rule div_enum:
     input:
-        "{OUT_FOLDER}reaction_weights_{condition}.csv",
-        "{CLUSTER_FILES}full_rxn_enum_solutions_{condition}.csv"
+        outpath+"reaction_weights_{condition}.csv",
+        cluspath+"full_rxn_enum_solutions_{condition}.csv"
     output:
-        "{CLUSTER_FILES}div_enum_stats_{condition}_{parallel}.csv",
-        "{CLUSTER_FILES}div_enum_solutions_{condition}_{parallel}.csv"
+        cluspath+"div_enum_stats_{condition}_{parallel}.csv",
+        cluspath+"div_enum_solutions_{condition}_{parallel}.csv"
     params: 
-        dist_anneal = lambda w: (1 - 1 / ({BATCH_NUM} * 2 * ({DIV_SOLS} / 10))) ** int(w.parallel)
+        dist_anneal = lambda w: (1 - 1 / (clus['batch_num'] * 2 * (clus['batch_div_sols'] / 10))) ** int(w.parallel)
     log:
         "logs/rxn_enum_{condition}_{parallel}.log"
     shell:
-        "python utilities_cluster/cluster_div_enum.py -c {wildcards.condition} -p {wildcards.parallel} -d {params.dist_anneal} -i {DIV_SOLS}"
+        "python utilities_cluster/cluster_div_enum.py -c {wildcards.condition} -p {wildcards.parallel} -d {params.dist_anneal} -i "+str(clus['batch_div_sols'])
 
 rule concat_rxn_sols:
     input:
-        expand("{CLUSTER_FILES}rxn_enum_solutions_{condition}_{parallel}.csv", condition=get_conditions(), parallel=get_parallel())
+        expand(cluspath+"rxn_enum_solutions_{condition}_{parallel}.csv", condition=get_conditions(), parallel=get_parallel())
     output:
-        expand("{CLUSTER_FILES}full_rxn_enum_solutions_{condition}.csv", condition=get_conditions())
+        expand(cluspath+"full_rxn_enum_solutions_{condition}.csv", condition=get_conditions())
     log:
         "logs/concat_rxn_enum.log"
     shell:
@@ -56,12 +51,12 @@ rule concat_rxn_sols:
 
 rule rxn_enum:
     input:
-        "{OUT_FOLDER}reaction_weights_{condition}.csv",
-        "{OUT_FOLDER}imat_solution_{condition}.csv"
+        outpath+"reaction_weights_{condition}.csv",
+        outpath+"imat_solution_{condition}.csv"
     output:
-        "{CLUSTER_FILES}rxn_enum_solutions_{condition}_{parallel}.csv"
+        cluspath+"rxn_enum_solutions_{condition}_{parallel}.csv"
     params: 
-        rxn_range = lambda w: str({RXN_SOLS}*int(w.parallel)) + '_' + str({RXN_SOLS}*(int(w.parallel)+1))
+        rxn_range = lambda w: str(clus['batch_rxn_sols']*int(w.parallel)) + '_' + str(clus['batch_rxn_sols']*(int(w.parallel)+1))
     log:
         "logs/rxn_enum_{condition}_{parallel}.log"
     shell:
@@ -69,11 +64,11 @@ rule rxn_enum:
 
 rule weights_imat:
     input: 
-        "{MODEL}",
-        "{EXPRESSIONFILE}"
+        doc['modelpath'],
+        doc['expressionfile']
     output:
-        "{OUT_FOLDER}reaction_weights_{condition}.csv",
-        "{OUT_FOLDER}imat_solution_{condition}.csv"
+        outpath+"reaction_weights_{condition}.csv",
+        outpath+"imat_solution_{condition}.csv"
     log:
         "logs/weights_imat_{condition}.log"
     shell:
