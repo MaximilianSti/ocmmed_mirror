@@ -5,7 +5,6 @@ import optlang
 from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn, filterwarnings, resetwarnings, catch_warnings
-import os
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:

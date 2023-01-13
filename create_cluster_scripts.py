@@ -57,7 +57,7 @@ if __name__ == '__main__':
                     ''.format(s=condition, c=clus['cores'], m=clus['memory'], t=clus['time'], p=cluspath, e=mail))
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
-                    (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+                    (clus['pythonmodule'], clus['envpath'], clus['cplexpath']))
             f.write('python utilities_cluster/cluster_weights_imat.py -c {s}'
                     ''.format(s=condition))
     with open('cluster_script_1.sh', 'w+') as f:
@@ -78,7 +78,7 @@ if __name__ == '__main__':
                                       p=cluspath, e=mail))
                     f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                             'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
-                            (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+                            (clus['pythonmodule'], clus['envpath'], clus['cplexpath']))
                     f.write('python utilities_cluster/cluster_rxn_enum.py -c {c} -r {r} -p {p}\n'
                             ''.format(c=condition, r=rxn_range, p=j))
                     f.write('python utilities_cluster/cluster_div_enum.py -c {c} -d {d} -i {maxiter} -p {p}'
@@ -100,7 +100,7 @@ if __name__ == '__main__':
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time'], e=mail))
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
-                    (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+                    (clus['pythonmodule'], clus['envpath'], clus['cplexpath']))
             f.write('\npython utilities_cluster/cluster_concat_rxn_solutions.py\n'
                     'python utilities_cluster/cluster_final_1.py\npython utilities_cluster/cluster_final_2.py')
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
                                       p=cluspath, e=mail))
                     f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                             'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
-                            (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+                            (clus['pythonmodule'], clus['envpath'], clus['cplexpath']))
                     f.write('python utilities_cluster/cluster_rxn_enum.py -c {c} -r {r} -p {p}\n'
                             ''.format(c=condition, r=rxn_range, p=j))
                 dist_a = (1 - 1 / (clus['batch_num'] * 2 * (clus['batch_div_sols'] / 10))) ** j
@@ -128,7 +128,7 @@ if __name__ == '__main__':
                                       p=cluspath, e=mail))
                     f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                             'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
-                            (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+                            (clus['pythonmodule'], clus['envpath'], clus['cplexpath']))
                     f.write('python utilities_cluster/cluster_div_enum.py -c {c} -d {d} -i {maxiter} -p {p}'
                             ''.format(c=condition, d=dist_a, p=j, maxiter=clus['batch_div_sols']))
             with open(cluspath + 'rxnenum_%i.sh' % i, 'w+') as f:
@@ -152,7 +152,7 @@ if __name__ == '__main__':
                     ''.format(c=clus['cores'], m=clus['memory'], t=clus['time'], e=mail))
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"\n' %
-                    (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+                    (clus['pythonmodule'], clus['envpath'], clus['cplexpath']))
             f.write('python utilities_cluster/cluster_concat_rxn_solutions.py\nfor i in {l}'
                     '\ndo\n    dos2unix {p}divenum_"$i".sh\n    sbatch {p}divenum_"$i".sh\ndone'
                     ''.format(l='{0..%i}' % (len(gene_conditions)-1), p=cluspath))
@@ -163,9 +163,8 @@ if __name__ == '__main__':
                     ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time'], e=mail))
             f.write('cd $SLURM_SUBMIT_DIR\nmodule purge\nmodule load %s\nsource %s/bin/activate\nexport '
                     'PYTHONPATH=${PYTHONPATH}:"%s"' %
-                    (clus['pythonpath'], clus['envpath'], clus['cplexpath']))
+                    (clus['pythonmodule'], clus['envpath'], clus['cplexpath']))
             f.write('\npython utilities_cluster/cluster_final_1.py'
-                    '\npython utilities_cluster/cluster_final_2.py'
-                    ''.format(p=cluspath, c=clus['cores'], m=clus['memory'], t=clus['time']))
+                    '\npython utilities_cluster/cluster_final_2.py')
     else:
         warn("Could not identify approach")

@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from cobra.flux_analysis import find_blocked_reactions
 from cobra import Configuration
+from utilities.force import force_active_rxns, force_reaction_bounds
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -21,11 +22,15 @@ else:
 modelpath = doc['modelpath']
 
 cobra_config = Configuration()
-cobra_config.solver = 'gurobi'
+cobra_config.solver = 'cplex'
 
 
 def compute_inactive_pathways(model):
     fullmodel = dexom_python.read_model(modelpath)
+    if doc['force_flux_bounds']:
+        force_reaction_bounds(fullmodel, doc['force_flux_bounds'])
+    if doc['force_active_reactions']:
+        force_active_rxns(fullmodel, doc['force_active_reactions'], doc['fluxvalue'])
     rxns_cell = set([r.id for r in model.reactions])
     rxns_full = set([r.id for r in fullmodel.reactions])
     if params['blocked_rxns']:

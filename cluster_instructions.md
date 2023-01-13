@@ -1,13 +1,14 @@
 
 # OCMMED cluster pipeline
 
-| Table of contents                                                                                    |
-|------------------------------------------------------------------------------------------------------|
-| [Installation instructions](cluster_instructions.md#Installation-instructions)                       |
-| [Installing cplex on the cluster](cluster_instructions.md#Installing-cplex-on-the-cluster)           |
-| [Setting parameters](cluster_instructions.md#Setting-parameters)                                     |
-| [Running the pipeline](cluster_instructions.md#Running-the-pipeline)                                 | 
-| [Files created by the cluster scripts](cluster_instructions.md#Files-created-by-the-cluster-scripts) | 
+| Table of contents                                                                                                    |
+|----------------------------------------------------------------------------------------------------------------------|
+| [Installation instructions](cluster_instructions.md#Installation-instructions)                                       |
+| [Installing cplex on the cluster](cluster_instructions.md#Installing-cplex-on-the-cluster)                           |
+| [Setting parameters](cluster_instructions.md#Setting-parameters)                                                     |
+| [Running the pipeline with snakemake](cluster_instructions.md#Running-the-pipeline-with-snakemake)                   |
+| [Running the pipeline with slurm (deprecated)](cluster_instructions.md#Running-the-pipeline-with-slurm-(deprecated)) | 
+| [Files created by the cluster scripts](cluster_instructions.md#Files-created-by-the-cluster-scripts)                 | 
 
 ## Installation instructions
 
@@ -39,7 +40,7 @@ module load system/Python-3.7.4
 ```
 `module purge` deactivates any currently loaded modules.  
 Here, we load a module called `Python-3.7.4` which is installed in the `system` folder of the slurm cluster.   
-If your python distribution is installed elsewhere, or if you are using a different version of python, you must modify this line. (In this case, you must also modify the same line in the `create_cluster_scripts.sh` file, as well as the `pythonpath` parameter in the `cluster_params.yaml` file)
+If your python distribution is installed elsewhere, or if you are using a different version of python, you must modify this line. (In this case, you must also modify the same line in the `create_cluster_scripts.sh` file, as well as the `pythonmodule` parameter in the `cluster_params.yaml` file)
 
 ```
 python -m venv env  
@@ -51,6 +52,7 @@ Here, we create a python virtual environment with the name "env", and we activat
 pip install --update pip  
 pip install dexom-python  
 pip install miom[full]
+pip install snakemake
 ```
 These commands update the package installer for python and then install the necessary packages for the OCMMED pipeline.
 
@@ -91,21 +93,27 @@ If your iterations take very long and often hit the timelimit, you may want to s
 
 - Modify the parameters in `cluster_params.yaml`
 
-If, during the installation, you modified the path to the python module `system/Python-3.7.4`, then you must also modify the `pythonpath` parameter  
+If, during the installation, you modified the path to the python module `system/Python-3.7.4`, then you must also modify the `pythonmodule` parameter  
 For the `cluster_files` parameter, I recommended using a different folder than `output_path`, as the program will create many files which are not necessary to keep after the run is finished.
 
 Note that on the cluster, the `rxn_enum_iterations` and `div_enum_iterations` parameters in the `parameters.yaml` file are ignored.  
 Instead, you must use the `batch_num`, `batch_rxn_sols` and `batch_div_sols` parameters in the `cluster_params.yaml` file to set the number of iterations.
 
-The `separate` approach is divided into 4 different scripts: 
-- one for computing reaction-weights and a starting iMAT solution
-- one for launching batches of reaction-enumeration
-- one for launching batches of diversity-enumeration
-- one for producing the final output
+## Running the pipeline with snakemake
 
-The `grouped` approach is condensed into 3 scripts (reaction-enumeration and diversity-enumeration are joined). There is a slightly higher probability of finding duplicate solutions, but for large solution numbers this effect is negligible.
+For better reproducibility and scalability, we now use the [snakemake](https://snakemake.github.io/) workflow managment tool to execute the OCMMED pipeline on computer clusters.  
+Once you have installed the necessary packages and defined the parameters in the .yaml files, you can launch the snakemake workflow which is detailed in the `Snakefile`.  
 
-## Running the pipeline
+If your cluster uses **slurm**, you can launch the entire pipeline simply via `sbatch submit_slurm.sh`. Once again, make sure that the file contains the correct paths to your cluster's python module, environment, and CPLEX installation.  
+The first snakemake command in `submit_slurm.sh` will create `dag.pdf`, which contains a graph of all the snakemake rules that will be executed during the pipeline.  You can use this graph to check that the pipeline is being executed on the correct conditions and with the correct number of parallel batches.  
+The second snakemake command uses the `submit_slurm.py` script as a wrapper for running the workflow. Note that the parameter  `-j 500` signifies that snakemake will submit up to 500 jobs at once; if you require more parallel batches, you may need increase this parameter.
+
+For running the pipeline on other types of clusters, please refer to the [snakemake documentation](https://snakemake.readthedocs.io/en/stable/executing/cluster.html).  
+Configurable profiles for various clusters can be found here: [https://github.com/Snakemake-Profiles](https://github.com/Snakemake-Profiles).
+
+## Running the pipeline with slurm (deprecated)
+
+**This way of running the OCMMED pipeline on slurm cluster is deprecated. We recommend using snakemake instead.**
 
 Once you have changed all the necessary parameters in the different .yaml files, you can run create_cluster_scripts:  
 ```
@@ -120,6 +128,14 @@ cluster_script_2.sh
 cluster_script_3.sh
 ```
 If you are using the `separate` approach, it will also create `cluster_script_4.sh`
+
+The `separate` approach is divided into 4 different scripts: 
+- one for computing reaction-weights and a starting iMAT solution
+- one for launching batches of reaction-enumeration
+- one for launching batches of diversity-enumeration
+- one for producing the final output
+
+The `grouped` approach is condensed into 3 scripts (reaction-enumeration and diversity-enumeration are joined). There is a slightly higher probability of finding duplicate solutions, but for large solution numbers this effect is negligible.
 
 Launch the first script: `sbatch cluster_script_1.sh`  
 You must then wait until all the computation is finished before launching the next script.  
@@ -142,12 +158,14 @@ In the _separate_ approach, `sbatch cluster_script_4.sh` will create the `cellsp
 Below is an overview of all the files that are produced by the cluster scripts.   
 This can be useful to check if a script has correctly finished running before launching the next script.
 
+**Note: when using snakemake, the pipeline is no longer divided into several scripts, but it still produces the same output files in the same order**
+
 **cluster_script_1**  
 If the parameter `qualitative` is set to `true`, this will produce the file geneweights_qualitative.csv in the output_path.  
 Then, for each condition, this script produces the following files:  
 - **in output_path:**  
-  - imat_solution_condition.csv  
-  - reaction_weights_condition.csv  
+  - reaction_weights_condition.csv 
+  - imat_solution_condition.csv
 - **in cluster_files:**  
   - imat_condition_err.out  
   - imat_condition_out.out  

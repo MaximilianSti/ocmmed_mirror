@@ -1,8 +1,8 @@
 import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
-from warnings import warn
 from utilities.minimal import mba
+from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.inactive_pathways import compute_inactive_pathways
 from cobra.io import write_sbml_model
 from cobra import Configuration
@@ -38,16 +38,21 @@ cobra_config.solver = 'cplex'
 
 if __name__ == '__main__':
     model = dexom_python.read_model(doc['modelpath'], solver='cplex')
+    if doc['force_flux_bounds']:
+        force_reaction_bounds(model, doc['force_flux_bounds'])
+    if doc['force_active_reactions']:
+        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
     frequencies = pd.read_csv(outpath + 'activation_frequency_reactions.csv', index_col=0)
     freq = frequencies[frequencies.columns[0]]
     if doc['final_network'] == 'union':
-        rem_rxns = freq[freq == 0].index.to_list()  # remove reactions which are active in zero solutions
+        # rem_rxns = freq[freq == 0].index.to_list()  # remove reactions which are active in zero solutions
+        rem_rxns = freq[freq < 0.01].index.to_list()  # remove reactions which are active in less than 1% of solutions
         for rxn in rem_rxns:
             model.remove_reactions([rxn], remove_orphans=True)
     elif doc['final_network'] == 'minimal':
         model = mba(model_keep=model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
     else:
-        warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
+        raise ValueError('Invalid value for "final_network" in parameters.yaml.')
     model.id += '_cellspecific'
     write_sbml_model(model, outpath+'cellspecific_model.xml')
     compute_inactive_pathways(model)

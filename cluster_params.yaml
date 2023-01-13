@@ -4,11 +4,11 @@ cluster_files: pilot_data_cluster_files
 # if the folder does not exist, it will be created
 # recommendation: use 2 different folders for cluster_files and output_path
 
-batch_num: 5
+batch_num: 2
 # number of parallel batches for each condition
-batch_rxn_sols: 10
+batch_rxn_sols: 5
 # number of reaction-enum solutions per batch
-batch_div_sols: 10
+batch_div_sols: 5
 # number of diversity-enum solutions per batch
 
 approach: separate
@@ -22,13 +22,13 @@ approach: separate
 emails: false
 # if true, you will receive an email alert everytime a batch starts and ends
 # if false, you will only receive no email alerts
-cores: 24
+cores: 4
 # number of cores to assign for each job
 memory: 64
 # allocated memory per job in gigabytes
-time: 10:00:00
+time: 00:10:00
 # maximum allowed runtime per job in hours:minutes:seconds
-pythonpath: system/Python-3.7.4
+pythonmodule: system/Python-3.7.4
 # path where the python module is located on the cluster
 envpath: env
 # path where the python virtual environment is located (by default: in the same registry as this file, in a folder called "env")
