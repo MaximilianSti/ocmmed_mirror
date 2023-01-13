@@ -109,7 +109,7 @@ The first snakemake command in `submit_slurm.sh` will create `dag.pdf`, which co
 The second snakemake command uses the `submit_slurm.py` script as a wrapper for running the workflow. Note that the parameter  `-j 500` signifies that snakemake will submit up to 500 jobs at once; if you require more parallel batches, you may need increase this parameter.
 
 For running the pipeline on other types of clusters, please refer to the [snakemake documentation](https://snakemake.readthedocs.io/en/stable/executing/cluster.html).  
-Configurable profiles for various clusters can be found here: [https://github.com/Snakemake-Profiles](https://github.com/Snakemake-Profiles).
+Configurable profiles for various clusters can be found here: https://github.com/Snakemake-Profiles
 
 ## Running the pipeline with slurm (deprecated)
 

@@ -11,7 +11,7 @@ The repository can be cloned with `git clone https://forgemia.inra.fr/metexplore
 
 For the installation of the cluster pipeline, see [cluster instructions file](cluster_instructions.md).
 
-For installing CPLEX on your own computer, detailed instructions are in the dexom-python package: https://pypi.org/project/dexom-python/  
+For installing CPLEX on your own computer, detailed instructions are given in the dexom-python package: https://pypi.org/project/dexom-python/  
 
 ## Parameters
 The `parameters.yaml` file contains the main parameters, including the path to the metabolic model and the path to the gene expression file  
@@ -37,7 +37,7 @@ Afterwards, DEXOM is used to enumerate multiple solutions (reaction-enumeration 
 The DEXOM solutions are merged and used to construct the new metabolic model which is saved as an SBML file.
 
 ## Cluster pipeline
-Because the enumeration of multiple solutions with DEXOM can be very slow when using large metabolic networks and/or large transcriptomic datasets, the pipeline has been adapted for use on a slurm computation cluster.  
+Because the enumeration of multiple solutions with DEXOM can be very slow when using large metabolic networks and/or large transcriptomic datasets, the pipeline has been adapted for use on computation clusters with the snakemake workflow managment tool.  
 Parameters for the cluster pipeline can be found in `cluster_params.yaml`  
 
-Refer to the [cluster instructions file](cluster_instructions.md) for an explanation fo the cluster pipeline.
+Refer to the [cluster instructions file](cluster_instructions.md) for a detailed explanation of the cluster pipeline.
