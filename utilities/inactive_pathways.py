@@ -51,7 +51,7 @@ def compute_inactive_pathways(model):
         rxns_inactive = set(find_blocked_reactions(fullmodel, reaction_list=potential_inactive))
     rxns_flux = rxns_full - rxns_inactive
     print('The new model has %i active reactions, out of a maximum of %i reactions' % (len(rxns_cell), len(rxns_flux)))
-    print('Percentage of inactive reactions: %i' % int((len(rxns_cell)/len(rxns_flux))))
+    print('Percentage of inactive reactions: {i}%'.format(i=int(100*(len(rxns_cell)/len(rxns_flux)))))
     paths = pd.Series(dtype=int)
     for g in fullmodel.groups:
         paths[g.name] = len([m for m in g.members if m.id in (rxns_flux - rxns_cell)])

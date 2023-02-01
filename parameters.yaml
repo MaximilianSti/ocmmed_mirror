@@ -37,7 +37,7 @@ gpr_parameters:
 ### these parameters are for additional constraints on the metabolic model
 
 force_flux_bounds:
-  MAR09931: 1e-4, 1000
+  MAR09931: 1e-3, 1000
 # manually define the lower and upper flux bounds for some reactions
 # this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
 
@@ -46,7 +46,7 @@ force_active_reactions:
 # manually define reactions that must carry flux, and their minimum flux value
 # particularly useful for reversible reactions that could carry flux in either direction
 # this can also be a text file containing reaction ideas
-fluxvalue: 1e-4
+fluxvalue: 1e-3
 # 'fluxvalue' is the absolute value that the minimal flux should have
 
 
