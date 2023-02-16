@@ -15,7 +15,7 @@ mem_gb = clus['memory']
 threads = clus['cores']
 runtime = clus['time']
 
-slurm_args = f" --mem {mem_gb}G -c {threads} -t {runtime}"
+slurm_args = f" --output=/dev/null --error=/dev/null --mem {mem_gb}G -c {threads} -t {runtime}"
 cmdline.append(slurm_args)
 
 dependencies = list(sys.argv[1:-1])

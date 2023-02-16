@@ -45,7 +45,8 @@ if __name__ == '__main__':
                                                   mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
     # read and process gene expression file
-    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = genes.loc[genes.index.dropna()]
     if doc['gpr_parameters']['qualitative'] and not doc['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=[condition],
                                                     proportion=doc['gpr_parameters']['percentile'],
@@ -61,7 +62,7 @@ if __name__ == '__main__':
         dexom_python.save_reaction_weights(rw, outpath + 'reaction_weights_%s.csv' % condition)
     else:
         rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
-                                filename=outpath+'reaction_weights_%s' % condition)
+                                    filename=outpath+'reaction_weights_%s' % condition)
 
     # compute imat solution from reaction weights
 
