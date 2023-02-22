@@ -36,7 +36,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
-    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = genes.loc[genes.index.dropna()]
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:

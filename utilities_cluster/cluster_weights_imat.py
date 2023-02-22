@@ -53,6 +53,8 @@ if __name__ == '__main__':
                                                     outpath=outpath+'geneweights_qualitative_%s' % condition)
     # create reaction weights from gene expression
     model = model_keep.copy()
+    model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
+                                             mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     print('computing reaction weights for condition '+condition)
     gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)
     if doc['reaction_scores']:

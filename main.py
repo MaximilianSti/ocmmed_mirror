@@ -48,7 +48,8 @@ if __name__ == '__main__':
     if doc['force_flux_bounds']:
         force_reaction_bounds(new_model, doc['force_flux_bounds'])
     # read and process gene expression file
-    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = genes.loc[genes.index.dropna()]
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:
@@ -76,6 +77,8 @@ if __name__ == '__main__':
         # compute imat solution from reaction weights
         print('performing iMAT for condition ' + condition)
         model = new_model.copy()
+        model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
+                                                 mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
         with catch_warnings():
             filterwarnings('error')
             try:
@@ -86,6 +89,9 @@ if __name__ == '__main__':
                 warn('Solver could not find a solution with forced active reactions. '
                       'Attempting to find a solution without forced flux.')
                 model = model_keep.copy()
+                model = dexom_python.check_model_options(model, timelimit=mp['timelimit'],
+                                                         feasibility=mp['feasibility'],
+                                                         mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
                 imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
                                             threshold=ip['threshold'])
                 print('The solver could not find a solution with forced active reactions, '
@@ -118,6 +124,7 @@ if __name__ == '__main__':
                                                       rxn_list=rxnlist,obj_tol=ep['objective_tolerance'],
                                                       eps=ip['epsilon'], thr=ip['threshold'])
         uniques = pd.DataFrame(rxnsol.unique_binary)
+        uniques.columns = [r.id for r in model.reactions]
         uniques.to_csv(outpath+'rxn_enum_solutions_%s.csv' % condition)
         print("length reaction-enumeration solution:", len(uniques))
         print('performing diversity-enumeration for condition ' + condition)
@@ -125,6 +132,7 @@ if __name__ == '__main__':
                                 dist_anneal=dp['dist_anneal'], eps=ip['epsilon'], thr=ip['threshold'], icut=dp['icut'],
                                 maxiter=doc['div_enum_iterations'], obj_tol=ep['objective_tolerance'],  full=dp['full'])
         divs = pd.DataFrame(divsol.binary)
+        divs.columns = [r.id for r in model.reactions]
         divs.to_csv(outpath+'div_enum_solutions_%s.csv' % condition)
         dexomsol = pd.concat([uniques, divs])
         dexom_sols.append(dexomsol)
