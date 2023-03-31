@@ -61,16 +61,15 @@ if __name__ == '__main__':
         force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
     rw = dexom_python.load_reaction_weights(filename=outpath + 'reaction_weights_%s.csv' % condition)
 
-    prevsol, prevbin = dexom_python.read_solution(outpath + 'imat_solution_%s.csv' % condition)
+    # prevsol, prevbin = dexom_python.read_solution(outpath + 'imat_solution_%s.csv' % condition)
     if clus['approach'] == 'grouped':
-        # prevsol, prevbin = dexom_python.read_solution(clus['cluster_files']+'rxn_enum_solution_%s_%s_1.csv' % (condition, args.parallel_id))
-        rxnenum_sols = pd.read_csv(cluspath + 'rxn_enum_solutions_%s_%s.csv' % (condition, args.parallel_id), index_col=0)
-        rxnenum_sols.columns = prevsol.fluxes.index
-        prevsol.fluxes = rxnenum_sols.iloc[0]
+        prevsol, _ = dexom_python.enum_functions.read_prev_sol(
+            cluspath + 'rxn_enum_fluxes_%s_%s.csv' % (condition, args.parallel_id), model=model, rw=rw,
+            eps=params['epsilon'], thr=params['threshold'], startsol=1)
     elif clus['approach'] == 'separate':
-        rxnenum_sols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
-        rxnenum_sols.columns = prevsol.fluxes.index
-        prevsol.fluxes = rxnenum_sols.iloc[int(args.parallel_id)]
+        prevsol, _ = dexom_python.enum_functions.read_prev_sol(
+            cluspath + 'full_rxn_enum_fluxes_%s.csv' % condition, model=model, rw=rw,
+            eps=params['epsilon'], thr=params['threshold'], startsol=int(args.parallel_id))
     else:
         warn("could not recognise approach, using iMAT solution as previous solution")
 
@@ -91,6 +90,8 @@ if __name__ == '__main__':
         solutions.columns = [r.id for r in model.reactions]
         solutions.to_csv(cluspath + 'div_enum_solutions_%s_%s.csv' % (condition, args.parallel_id))
         divres.to_csv(cluspath + 'div_enum_stats_%s_%s.csv' % (condition, args.parallel_id))
+        fluxes = pd.concat([s.fluxes for s in divsol.solutions], axis=1).T.reset_index().drop('index', axis=1)
+        fluxes.to_csv(cluspath + 'div_enum_fluxes_%s_%s.csv' % (condition, args.parallel_id))
     else:
         warn('cplex is not properly installed and the force_cplex parameter is set to True')
         with open(cluspath + 'div_enum_CPLEXERROR_%s_%s.txt' % (condition, args.parallel_id), 'w+') as file:

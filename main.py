@@ -126,6 +126,8 @@ if __name__ == '__main__':
         uniques = pd.DataFrame(rxnsol.unique_binary)
         uniques.columns = [r.id for r in model.reactions]
         uniques.to_csv(outpath+'rxn_enum_solutions_%s.csv' % condition)
+        fluxes = pd.concat([s.fluxes for s in rxnsol.unique_solutions], axis=1).T.reset_index().drop('index', axis=1)
+        fluxes.to_csv(outpath+'rxn_enum_fluxes_%s.csv' % condition)
         print("length reaction-enumeration solution:", len(uniques))
         print('performing diversity-enumeration for condition ' + condition)
         divsol, divres = dexom_python.enum_functions.diversity_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
@@ -134,14 +136,15 @@ if __name__ == '__main__':
         divs = pd.DataFrame(divsol.binary)
         divs.columns = [r.id for r in model.reactions]
         divs.to_csv(outpath+'div_enum_solutions_%s.csv' % condition)
+        fluxd = pd.concat([s.fluxes for s in divs.solutions], axis=1).T.reset_index().drop('index', axis=1)
+        fluxd.to_csv(outpath+'div_enum_fluxes_%s.csv' % condition)
         dexomsol = pd.concat([uniques, divs])
         dexom_sols.append(dexomsol)
 
     dexom_sols = pd.concat(dexom_sols).drop_duplicates(ignore_index=True)
     dexom_sols.to_csv(outpath + 'dexom_solutions.csv')
     dexom_sols.columns = [r.id for r in model_keep.reactions]
-    frequencies = dexom_sols.sum()
-    frequencies.columns = ['frequency']
+    frequencies = dexom_sols.sum()._set_name('frequency')
     frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
 
     print('producing final network')
