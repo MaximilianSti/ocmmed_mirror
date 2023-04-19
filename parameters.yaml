@@ -1,11 +1,11 @@
 
 ### these are the filepaths used in the pipeline
 
-modelpath: iMM1865_modifs.xml
+modelpath: pilot_data/Human-GEM11.xml
 # must be a valid cobrapy model (either .xml, .json, or .mat)
-expressionfile: RNAseq_GeneExp_bin_4groups.csv
+expressionfile: pilot_data/gene_IDs_meanvalues.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
-output_path: M-DMSO
+output_path: pilot_data_results
 # path to a folder in which the output files will be saved. If the folder does not exist, it will be created
 
 
@@ -15,9 +15,9 @@ reaction_scores: false
 # set this to true if the expressionfile already contains reaction identifiers instead of gene identifiers.
 # If true, the conversion of gene expression to reaction weights will be skipped, and the provided scores will be mapped directly on the reactions.
 
-gene_ID_column: NCBI
+gene_ID_column: ID
 # name of the column containing gene IDs
-gene_expression_columns: TPM.M.DMSO
+gene_expression_columns:
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
 # if empty, all columns (except the gene_ID_column) will be used
@@ -26,7 +26,7 @@ duplicates: remove
 # possible methods: "remove", "min", "max", "mean", "median"
 gpr_parameters:
   # parameters for the gene-protein-reaction rules
-  qualitative: false
+  qualitative: true
   # if true, the gene expression will be converted to reaction weights -1/0/1
   # if false, the expression will directly be mapped to the reactions
   percentile: 0.25
@@ -37,7 +37,8 @@ gpr_parameters:
 ### these parameters are for additional constraints on the metabolic model
 
 force_flux_bounds:
-  BIOMASS_reaction: 1e-2,1000
+  MAR09931: 1, 1000
+#  BIOMASS_reaction: 1e-2,1000
 # manually define the lower and upper flux bounds for some reactions
 # this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
 
@@ -52,8 +53,9 @@ fluxvalue: 1e-3
 
 ### these parameters are for the network enumeration
 
-rxn_enum_iterations: 10
-div_enum_iterations: 10
+rxn_enum_iterations: 3
+div_enum_iterations: 3
+
 # number of iterations for reaction-enum and diversity-enum (if using the main.py script)
 
 

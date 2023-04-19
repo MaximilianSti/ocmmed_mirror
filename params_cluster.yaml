@@ -35,5 +35,10 @@ envpath: env
 cplexpath: /home/mstingl/save/CPLEX_Studio1210/cplex/python/3.7/x86-64_linux
 # path where the cplex binary is located
 
-force_cplex: True
+force_cplex: true
 # if True, the optimizations will be run only if the cplex solver is available
+
+suppress_slurmfiles: true
+# when set to "true", suppresses the slurm output files in the format "slurm-[jobID].out"
+# this is useful to avoid cluttering the cluster folder with many redundant output files
+# but if an error occurs the error message won't appear in the logs.
