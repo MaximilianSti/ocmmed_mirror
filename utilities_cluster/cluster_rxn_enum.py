@@ -66,13 +66,14 @@ if __name__ == '__main__':
 
     if rp['reaction_list']:
         df = pd.read_csv(rp['reaction_list'], header=None)
-        reactions = [x for x in df.unstack().values]
-        wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
-        for rid in wrongrids:
-            warn('reaction %s is not in the model, this reaction will be skipped' % rid)
-        reactions = list(set(reactions) - set(wrongrids))
     else:
-        reactions = [r.id for r in model.reactions]
+        df = pd.read_csv(outpath + model.id + '_reactions_shuffled.csv', header=None)
+    reactions = [x for x in df.unstack().values]
+    wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
+    for rid in wrongrids:
+        warn('reaction %s is not in the model, this reaction will be skipped' % rid)
+    reactions = list(set(reactions) - set(wrongrids))
+
     if params['blocked_rxns']:
         seps = ['\t', ';', ',', '\n']  # list of potential separators for the file
         with open(params['blocked_rxns']) as file:
