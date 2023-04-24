@@ -65,11 +65,11 @@ if __name__ == '__main__':
     if clus['approach'] == 'grouped':
         prevsol, _ = dexom_python.enum_functions.read_prev_sol(
             cluspath + 'rxn_enum_fluxes_%s_%s.csv' % (condition, args.parallel_id), model=model, rw=rw,
-            eps=params['epsilon'], thr=params['threshold'], startsol=1)
+            eps=ip['epsilon'], thr=ip['threshold'], startsol=1)
     elif clus['approach'] == 'separate':
         prevsol, _ = dexom_python.enum_functions.read_prev_sol(
             cluspath + 'full_rxn_enum_fluxes_%s.csv' % condition, model=model, rw=rw,
-            eps=params['epsilon'], thr=params['threshold'], startsol=int(args.parallel_id))
+            eps=ip['epsilon'], thr=ip['threshold'], startsol=int(args.parallel_id))
     else:
         warn("could not recognise approach, using iMAT solution as previous solution")
 

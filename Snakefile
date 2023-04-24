@@ -9,8 +9,6 @@ rule produce_cellspecific_model:
         outpath+'activation_frequency_reactions.csv'
     output:
         outpath+'cellspecific_model.xml'
-    log:
-        'logs/cluster_final_2.log'
     shell:
         'python utilities_cluster/cluster_final_2.py'
 
@@ -20,8 +18,6 @@ rule concat_div_sols:
     output:
         outpath+'all_DEXOM_solutions.csv',
         outpath+'activation_frequency_reactions.csv'
-    log:
-        'logs/cluster_final_1.log'
     shell:
         'python utilities_cluster/cluster_final_1.py'
 
@@ -34,8 +30,6 @@ rule div_enum:
         cluspath+'div_enum_solutions_{condition}_{parallel}.csv'
     params: 
         dist_anneal = lambda w: (1 - 1 / (clus['batch_num'] * 2 * (clus['batch_div_sols'] / 10))) ** int(w.parallel)
-    log:
-        'logs/rxn_enum_{condition}_{parallel}.log'
     shell:
         'python utilities_cluster/cluster_div_enum.py -c "{wildcards.condition}" -p {wildcards.parallel} -d {params.dist_anneal} -i '+str(clus['batch_div_sols'])
 
@@ -44,8 +38,6 @@ rule concat_rxn_sols:
         expand(cluspath+'rxn_enum_solutions_{condition}_{parallel}.csv', condition=get_conditions(), parallel=get_parallel())
     output:
         expand(cluspath+'full_rxn_enum_solutions_{condition}.csv', condition=get_conditions())
-    log:
-        'logs/concat_rxn_enum.log'
     shell:
         'python utilities_cluster/cluster_concat_rxn_solutions.py'
 
@@ -57,8 +49,6 @@ rule rxn_enum:
         cluspath+'rxn_enum_solutions_{condition}_{parallel}.csv'
     params: 
         rxn_range = lambda w: str(clus['batch_rxn_sols']*int(w.parallel)) + '_' + str(clus['batch_rxn_sols']*(int(w.parallel)+1))
-    log:
-        'logs/rxn_enum_{condition}_{parallel}.log'
     shell:
         'python utilities_cluster/cluster_rxn_enum.py -c "{wildcards.condition}" -p {wildcards.parallel} -r {params.rxn_range}'
 
@@ -69,7 +59,5 @@ rule weights_imat:
     output:
         outpath+'reaction_weights_{condition}.csv',
         outpath+'imat_solution_{condition}.csv'
-    log:
-        'logs/weights_imat_{condition}.log'
     shell:
         'python utilities_cluster/cluster_weights_imat.py -c "{wildcards.condition}"'
