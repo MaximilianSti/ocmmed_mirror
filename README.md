@@ -44,3 +44,6 @@ Pictured below is the snakemake rulegraph representation of the "separate" workf
 Refer to the [cluster instructions file](cluster_instructions.md) for a detailed explanation.  
 
 ![rulegraph](rulegraph.png)
+
+## Versioning
+Version 1.0 is used for the cell-specific metabolic networks from the GOLIATH project: https://doi.org/10.3030/825489
