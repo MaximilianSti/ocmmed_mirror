@@ -40,7 +40,7 @@ The DEXOM solutions are merged and used to construct the new metabolic model whi
 Because the enumeration of multiple solutions with DEXOM can be very slow when using large metabolic networks and/or large transcriptomic datasets, the pipeline has been adapted for use on computation clusters with the snakemake workflow managment tool.  
 Parameters for the cluster pipeline can be found in `params_cluster.yaml`  
 
-Pictured below is the snakemake rulegraph representation of the workflow.  
+Pictured below is the snakemake rulegraph representation of the "separate" workflow.  
 Refer to the [cluster instructions file](cluster_instructions.md) for a detailed explanation.  
 
 ![rulegraph](rulegraph.png)
