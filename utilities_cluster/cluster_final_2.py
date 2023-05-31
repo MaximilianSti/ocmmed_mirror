@@ -6,6 +6,7 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.inactive_pathways import compute_inactive_pathways
 from cobra.io import write_sbml_model
 from cobra import Configuration
+from warnings import warn
 import os
 
 yaml_reader = yaml.YAML(typ='safe')
@@ -45,8 +46,14 @@ if __name__ == '__main__':
     frequencies = pd.read_csv(outpath + 'activation_frequency_reactions.csv', index_col=0)
     freq = frequencies[frequencies.columns[0]]
     if doc['final_network'] == 'union':
-        # rem_rxns = freq[freq == 0].index.to_list()  # remove reactions which are active in zero solutions
-        rem_rxns = freq[freq < 0.01].index.to_list()  # remove reactions which are active in less than 1% of solutions
+        cutoff = doc['union_cutoff']
+        if isinstance(cutoff, str):
+            if cutoff[-1] == '%':
+                cutoff = len(freq) * float(cutoff[:-1]) / 100
+            else:
+                warn('Unrecognized character in union_cutoff parameter, default to 0.')
+                cutoff = 0
+        rem_rxns = freq[freq <= cutoff].index.to_list()  # remove reactions which are active in less than union_cutoff solutions
         for rxn in rem_rxns:
             model.remove_reactions([rxn], remove_orphans=True)
     elif doc['final_network'] == 'minimal':

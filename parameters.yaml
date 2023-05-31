@@ -37,7 +37,8 @@ gpr_parameters:
 ### these parameters are for additional constraints on the metabolic model
 
 force_flux_bounds:
-  MAR09931: 1e-3, 1000
+  MAR09931: 1, 1000
+#  BIOMASS_reaction: 1e-2,1000
 # manually define the lower and upper flux bounds for some reactions
 # this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
 
@@ -54,6 +55,7 @@ fluxvalue: 1e-3
 
 rxn_enum_iterations: 3
 div_enum_iterations: 3
+
 # number of iterations for reaction-enum and diversity-enum (if using the main.py script)
 
 
@@ -64,3 +66,7 @@ final_network: union
 # must be either 'union' or 'minimal'
 # 'union' contains all reactions which are active in at least one DEXOM solution
 # 'minimal' contains only the reactions which are active in every solution + the reactions necessary to make the network flux-consistent
+
+union_cutoff: 0
+# only for the 'union' method
+# for a given reaction, if the number of solutions in which it is active <= union_cutoff, then this reaction is ignored

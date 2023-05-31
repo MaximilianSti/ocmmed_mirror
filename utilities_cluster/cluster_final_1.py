@@ -34,7 +34,8 @@ cobra_config.solver = 'cplex'
 
 
 if __name__ == '__main__':
-    genes = pd.read_csv(expressionfile).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = genes.loc[genes.index.dropna()]
     if doc['gene_expression_columns']:
         gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
     else:
@@ -46,10 +47,22 @@ if __name__ == '__main__':
         for f in solfiles:
             sol = pd.read_csv(f, index_col=0)
             solutions.append(sol)
-        divsols = pd.concat(solutions).drop_duplicates(ignore_index=True)
-        divsols.to_csv(cluspath + 'full_div_enum_solutions_%s.csv' % condition)
-        rxnsols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
-        dexomsols = pd.concat([divsols, rxnsols]).drop_duplicates(ignore_index=True)
+        div_sols = pd.concat(solutions, ignore_index=True).drop_duplicates()
+        
+        fluxes = []
+        fluxfiles = Path(cluspath).glob('div_enum_fluxes_%s_*.csv' % condition)
+        for f in fluxfiles:
+            fl = pd.read_csv(f, index_col=0)
+            fluxes.append(fl)
+        div_fluxes = pd.concat(fluxes, ignore_index=True).loc[div_sols.index]
+
+        div_sols.reset_index(inplace=True, drop=True)
+        div_fluxes.reset_index(inplace=True, drop=True)
+        
+        div_sols.to_csv(cluspath + 'full_div_enum_solutions_%s.csv' % condition)
+        div_fluxes.to_csv(cluspath + 'full_div_enum_fluxes_%s.csv' % condition)
+        rxn_sols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
+        dexomsols = pd.concat([div_sols, rxn_sols]).drop_duplicates(ignore_index=True)
         dexomsols.to_csv(outpath + 'all_DEXOM_solutions_%s.csv' % condition)
         all_sols.append(dexomsols)
     dex = pd.concat(all_sols).drop_duplicates(ignore_index=True)

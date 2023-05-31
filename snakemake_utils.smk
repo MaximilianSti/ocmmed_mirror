@@ -1,12 +1,17 @@
 import ruamel.yaml as yaml
 import pandas as pd
 import os
+import dexom_python as dp
 
 # read configuration from YAML files
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
+
+with open('params_additional.yaml', 'r') as file:
+    b = file.read()
+pad = yaml_reader.load(b)
 
 with open('params_cluster.yaml', 'r') as file:
     c = file.read()
@@ -33,7 +38,7 @@ else:
 if doc['gene_expression_columns']:
     gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
 else:
-    genes = pd.read_csv(doc['expressionfile']).set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(doc['expressionfile'], sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
     gene_conditions = genes.columns.to_list()
 
 def get_conditions():
@@ -41,4 +46,8 @@ def get_conditions():
 
 def get_parallel():
     return list(range(clus['batch_num']))
+
+if not pad['rxn_enum_params']['reaction_list']:
+    m = dp.read_model(doc['modelpath'])
+    dp.model_functions.get_all_reactions_from_model(m, save=True, shuffle=True, out_path=outpath)
 
