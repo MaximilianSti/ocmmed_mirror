@@ -1,14 +1,14 @@
 
-cluster_files: mouse_cluster_files
+cluster_files: hepatocytes_cluster_files
 # path to a folder where various files will be saved for the cluster computation
 # if the folder does not exist, it will be created
 # recommendation: use 2 different folders for cluster_files and output_path
 
-batch_num: 10
+batch_num: 5
 # number of parallel batches for each condition
-batch_rxn_sols: 200
+batch_rxn_sols: 70
 # number of reaction-enum solutions per batch
-batch_div_sols: 200
+batch_div_sols: 70
 # number of diversity-enum solutions per batch
 
 approach: separate
@@ -22,9 +22,9 @@ approach: separate
 emails: false
 # if true, you will receive an email alert everytime a batch starts and ends
 # if false, you will only receive no email alerts
-cores: 24
+cores: 12
 # number of cores to assign for each job
-memory: 64
+memory: 48
 # allocated memory per job in gigabytes
 time: 10:00:00
 # maximum allowed runtime per job in hours:minutes:seconds
@@ -35,10 +35,7 @@ envpath: env
 cplexpath: /home/mstingl/save/CPLEX_Studio1210/cplex/python/3.7/x86-64_linux
 # path where the cplex binary is located
 
-force_cplex: true
-# if True, the optimizations will be run only if the cplex solver is available
-
 suppress_slurmfiles: true
-# when set to "true", suppresses the slurm output files in the format "slurm-[jobID].out"
-# this is useful to avoid cluttering the cluster folder with many redundant output files
-# but if an error occurs the error message won't appear in the logs.
+
+force_cplex: True
+# if True, the optimizations will be run only if the cplex solver is available
