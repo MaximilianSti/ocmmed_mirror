@@ -27,7 +27,7 @@ enum_params:
   # if you are using discrete weights instead of qualitative weights, increase this parameter up to 1e-2 for faster runtimes
 
 rxn_enum_params:
-  reaction_list: pilot_data/HumanGEM11_reactions_shuffled.csv
+  reaction_list: data/fluxmaintenance_HumanGEM_reactions_shuffled.csv
   # OPTIONAL
   # providing a shuffled list of reactions can reduce possible bias in the reaction-enumeration method
   # if left empty, the reactions will be used in the order in which they are in the network
@@ -42,7 +42,7 @@ div_enum_params:
   # if true, will use the full-DEXOM implementation (see dexom-python documentation).
   # This very significantly increases the computation time per iteration and should only be done on small models
 
-blocked_rxns: pilot_data/human-gem11_blocked.txt
+blocked_rxns:
 # OPTIONAL
 # provide a list of reactions which are blocked in the model.
 # This will be used for determining which reactions are inactive in the cell-specific model

@@ -7,7 +7,6 @@ from utilities.inactive_pathways import compute_inactive_pathways
 from cobra.io import write_sbml_model
 from cobra import Configuration
 from warnings import warn
-import os
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -49,7 +48,7 @@ if __name__ == '__main__':
         cutoff = doc['union_cutoff']
         if isinstance(cutoff, str):
             if cutoff[-1] == '%':
-                cutoff = len(freq) * float(cutoff[:-1]) / 100
+                cutoff = freq.max() * float(cutoff[:-1]) / 100
             else:
                 warn('Unrecognized character in union_cutoff parameter, default to 0.')
                 cutoff = 0
