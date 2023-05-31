@@ -136,7 +136,7 @@ if __name__ == '__main__':
         divs = pd.DataFrame(divsol.binary)
         divs.columns = [r.id for r in model.reactions]
         divs.to_csv(outpath+'div_enum_solutions_%s.csv' % condition)
-        fluxd = pd.concat([s.fluxes for s in divs.solutions], axis=1).T.reset_index().drop('index', axis=1)
+        fluxd = pd.concat([s.fluxes for s in divsol.solutions], axis=1).T.reset_index().drop('index', axis=1)
         fluxd.to_csv(outpath+'div_enum_fluxes_%s.csv' % condition)
         dexomsol = pd.concat([uniques, divs])
         dexom_sols.append(dexomsol)
@@ -149,7 +149,14 @@ if __name__ == '__main__':
 
     print('producing final network')
     if doc['final_network'] == 'union':
-        rem_rxns = dexom_sols.columns[frequencies == 0].to_list()  # remove reactions which are active in zero solutions
+        cutoff = doc['union_cutoff']
+        if isinstance(cutoff, str):
+            if cutoff[-1] == '%':
+                cutoff = frequencies.max() * float(cutoff[:-1]) / 100
+            else:
+                warn('Unrecognized character in union_cutoff parameter, default to 0.')
+                cutoff = 0
+        rem_rxns = dexom_sols.columns[frequencies <= cutoff].to_list()  # remove reactions which are active in zero solutions
         new_model.remove_reactions(rem_rxns, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
         new_model = mba(model_keep=new_model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
