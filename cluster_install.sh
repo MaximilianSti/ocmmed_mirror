@@ -6,8 +6,8 @@
 #SBATCH -c 8
 
 cd $SLURM_SUBMIT_DIR
-git clone https://forgemia.inra.fr/metexplore/cbm/ocmmed.git ocmmed_mouse
-cd ocmmed_mouse
+git clone https://forgemia.inra.fr/metexplore/cbm/ocmmed.git ocmmed
+cd ocmmed
 
 echo "creating python environment'"
 

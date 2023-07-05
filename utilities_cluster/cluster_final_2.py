@@ -1,10 +1,12 @@
 import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
-from utilities.minimal import mba
+import miom
+from utilities.minimal import maximal_frequency
 from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.inactive_pathways import compute_inactive_pathways
 from cobra.io import write_sbml_model
+from cobra.flux_analysis import find_blocked_reactions
 from cobra import Configuration
 from warnings import warn
 
@@ -53,10 +55,15 @@ if __name__ == '__main__':
                 warn('Unrecognized character in union_cutoff parameter, default to 0.')
                 cutoff = 0
         rem_rxns = freq[freq <= cutoff].index.to_list()  # remove reactions which are active in less than union_cutoff solutions
-        for rxn in rem_rxns:
-            model.remove_reactions([rxn], remove_orphans=True)
+        model.remove_reactions([rem_rxns], remove_orphans=True)
+        if cutoff > 0:
+            # blocked_reactions = find_blocked_reactions(model)
+            miom_model = miom.load(miom.mio.cobra_to_miom(model), 'cplex')
+            miom_model.steady_state().subset_selection(1).solve()
+            blocked = [x for i, x in zip(miom_model.variables.reaction_activity, miom_model.network.R['id']) if i==0.]
+            model.remove_reactions(blocked, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
-        model = mba(model_keep=model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
+        model = maximal_frequency(model_keep=model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
     else:
         raise ValueError('Invalid value for "final_network" in parameters.yaml.')
     model.id += '_cellspecific'

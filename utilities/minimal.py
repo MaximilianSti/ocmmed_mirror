@@ -5,7 +5,7 @@ from cobra.io import write_sbml_model
 from dexom_python import read_model, check_model_options
 
 
-def mba(model_keep, frequency_table, essential_reactions):
+def maximal_frequency(model_keep, frequency_table, essential_reactions):
     frequencies = None
     if isinstance(frequency_table, pd.Series):
         frequencies = frequency_table.sort_values(ascending=False)
@@ -88,18 +88,13 @@ def mba(model_keep, frequency_table, essential_reactions):
         miom_model = miom.load(miom.mio.cobra_to_miom(temp_model), 'cplex')
         miom_model.steady_state().subset_selection(1).solve()
         flux_consistent_model = miom_model.select_subnetwork()
-
         if not False in [r in flux_consistent_model.network.R['id'] for r in essential_reactions]:
             print('reached frequency value:', v)
             break
-
-    keep_recs = list(flux_consistent_model.network.R['id'])
     new_model = model_keep.copy()
-    rem_recs = list(set([r.id for r in model_keep.reactions]) - set(keep_recs))
+    rem_recs = [x for i, x in zip(miom_model.variables.reaction_activity, miom_model.network.R['id']) if i == 0.]
     new_model.remove_reactions(rem_recs, remove_orphans=True)
-
-    new_model.id += '_mba'
-
+    new_model.id += '_minimal'
     return new_model
 
 
@@ -112,5 +107,5 @@ if __name__ == '__main__':
     rxns = ['MAR09931']
     m.reactions.get_by_id('MAR09931').upper_bound = 1000.
 
-    new_model = mba(model_keep=m,  frequency_table=freq, essential_reactions=rxns)
-    write_sbml_model(new_model, 'new_mba_model.xml')
+    new_model = maximal_frequency(model_keep=m,  frequency_table=freq, essential_reactions=rxns)
+    write_sbml_model(new_model, 'new_minimal_model.xml')

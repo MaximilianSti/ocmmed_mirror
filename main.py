@@ -2,8 +2,9 @@ import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
 from cobra.io import write_sbml_model
+from cobra.flux_analysis import find_blocked_reactions
 from utilities.force import force_active_rxns, force_reaction_bounds
-from utilities.minimal import mba
+from utilities.minimal import maximal_frequency
 from utilities.inactive_pathways import compute_inactive_pathways
 from warnings import warn, catch_warnings, filterwarnings, resetwarnings
 import os
@@ -158,8 +159,11 @@ if __name__ == '__main__':
                 cutoff = 0
         rem_rxns = dexom_sols.columns[frequencies <= cutoff].to_list()  # remove reactions which are active in zero solutions
         new_model.remove_reactions(rem_rxns, remove_orphans=True)
+        if cutoff > 0:
+            blocked_reactions = find_blocked_reactions(new_model)
+            new_model.remove_reactions(blocked_reactions, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
-        new_model = mba(model_keep=new_model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
+        new_model = maximal_frequency(model_keep=new_model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
     else:
         warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     new_model.id += '_cellspecific'
