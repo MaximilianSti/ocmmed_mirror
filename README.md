@@ -46,4 +46,4 @@ Refer to the [cluster instructions file](cluster_instructions.md) for a detailed
 ![rulegraph](rulegraph.png)
 
 ## Versioning
-Version 1.0 is used for the cell-specific metabolic networks from the GOLIATH project: https://doi.org/10.3030/825489
+Version 1.0.1 is used for the cell-specific metabolic networks from the GOLIATH project: https://doi.org/10.3030/825489
