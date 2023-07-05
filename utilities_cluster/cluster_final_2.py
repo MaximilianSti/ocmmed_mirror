@@ -57,10 +57,7 @@ if __name__ == '__main__':
         rem_rxns = freq[freq <= cutoff].index.to_list()  # remove reactions which are active in less than union_cutoff solutions
         model.remove_reactions([rem_rxns], remove_orphans=True)
         if cutoff > 0:
-            # blocked_reactions = find_blocked_reactions(model)
-            miom_model = miom.load(miom.mio.cobra_to_miom(model), 'cplex')
-            miom_model.steady_state().subset_selection(1).solve()
-            blocked = [x for i, x in zip(miom_model.variables.reaction_activity, miom_model.network.R['id']) if i==0.]
+            blocked = find_blocked_reactions(model)
             model.remove_reactions(blocked, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
         model = maximal_frequency(model_keep=model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
