@@ -55,7 +55,7 @@ if __name__ == '__main__':
                 warn('Unrecognized character in union_cutoff parameter, default to 0.')
                 cutoff = 0
         rem_rxns = freq[freq <= cutoff].index.to_list()  # remove reactions which are active in less than union_cutoff solutions
-        model.remove_reactions([rem_rxns], remove_orphans=True)
+        model.remove_reactions(rem_rxns, remove_orphans=True)
         if cutoff > 0:
             blocked = find_blocked_reactions(model)
             model.remove_reactions(blocked, remove_orphans=True)
