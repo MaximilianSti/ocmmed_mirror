@@ -21,6 +21,7 @@ gene_expression_columns:
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
 # if empty, all columns (except the gene_ID_column) will be used
+# for the DAR computation (differentially activated reactions), the first column will be regarded as the control/reference condition
 duplicates: remove
 # how to deal with genes for which several values are present in the expression file, in case these values have conflicting information
 # possible methods: "remove", "min", "max", "mean", "median"

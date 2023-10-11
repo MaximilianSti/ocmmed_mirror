@@ -6,26 +6,12 @@ yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
 doc = yaml_reader.load(a)
-with open('params_additional.yaml', 'r') as file:
-    b = file.read()
-params = yaml_reader.load(b)
-with open('params_cluster.yaml', 'r') as file:
-    c = file.read()
-clus = yaml_reader.load(c)
-
-modelpath = doc['modelpath']
 if doc['output_path']:
     outpath = doc['output_path']
     if outpath[-1] not in ['/', '\\']:
         outpath += '/'
 else:
     outpath = ''
-if clus['cluster_files']:
-    cluspath = clus['cluster_files']
-    if cluspath[-1] not in ['/', '\\']:
-        cluspath += '/'
-else:
-    cluspath = outpath
 
 
 def compute_differentially_activated_reactions(input_folder=None, control=None, r2_threshold=0.2):
@@ -43,10 +29,7 @@ def compute_differentially_activated_reactions(input_folder=None, control=None, 
     elif control not in conditions:
         raise ValueError('No condition named %s in condition list' % control)
     if input_folder is None:
-        if os.path.exists(cluspath):
-            inputpath = cluspath
-        else:
-            inputpath = outpath
+        inputpath = outpath
     dataframes = {}
     for c in conditions:
         path = inputpath + 'all_DEXOM_solutions_%s.csv' % c

@@ -1,10 +1,10 @@
 import dexom_python
 import ruamel.yaml as yaml
 import pandas as pd
-import miom
 from utilities.minimal import maximal_frequency
 from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.inactive_pathways import compute_inactive_pathways
+from utilities.differentially_activated_reactions import compute_differentially_activated_reactions
 from cobra.io import write_sbml_model
 from cobra.flux_analysis import find_blocked_reactions
 from cobra import Configuration
@@ -66,3 +66,4 @@ if __name__ == '__main__':
     model.id += '_cellspecific'
     write_sbml_model(model, outpath+'cellspecific_model.xml')
     compute_inactive_pathways(model)
+    compute_differentially_activated_reactions()

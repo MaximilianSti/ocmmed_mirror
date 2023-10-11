@@ -3,7 +3,6 @@ import ruamel.yaml as yaml
 import pandas as pd
 from pathlib import Path
 from cobra import Configuration
-import os
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
