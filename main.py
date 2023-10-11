@@ -6,6 +6,7 @@ from cobra.flux_analysis import find_blocked_reactions
 from utilities.force import force_active_rxns, force_reaction_bounds
 from utilities.minimal import maximal_frequency
 from utilities.inactive_pathways import compute_inactive_pathways
+from utilities.differentially_activated_reactions import compute_differentially_activated_reactions
 from warnings import warn, catch_warnings, filterwarnings, resetwarnings
 import os
 
@@ -139,7 +140,8 @@ if __name__ == '__main__':
         divs.to_csv(outpath+'div_enum_solutions_%s.csv' % condition)
         fluxd = pd.concat([s.fluxes for s in divsol.solutions], axis=1).T.reset_index().drop('index', axis=1)
         fluxd.to_csv(outpath+'div_enum_fluxes_%s.csv' % condition)
-        dexomsol = pd.concat([uniques, divs])
+        dexomsol = pd.concat([uniques, divs]).drop_duplicates(ignore_index=True)
+        dexomsol.to_csv(outpath+'all_DEXOM_solutions_%s.csv' % condition)
         dexom_sols.append(dexomsol)
 
     dexom_sols = pd.concat(dexom_sols).drop_duplicates(ignore_index=True)
@@ -169,3 +171,4 @@ if __name__ == '__main__':
     new_model.id += '_cellspecific'
     write_sbml_model(new_model, outpath+'cellspecific_model.xml')
     compute_inactive_pathways(new_model)
+    compute_differentially_activated_reactions()
