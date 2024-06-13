@@ -33,6 +33,13 @@ ep = params['enum_params']
 modelpath = doc['modelpath']
 expressionfile = doc['expressionfile']
 
+yaml_writer = yaml.YAML()
+saveparams = doc.copy()
+saveparams.update(params)
+saveparams.update(clus)
+with open(outpath + 'parameters_used_for_run.yaml', 'w+') as file:
+    yaml_writer.dump(saveparams, file)
+
 
 if __name__ == '__main__':
     description = 'For a given condition calculates reaction weights and computes iMAT solution'
