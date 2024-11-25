@@ -24,5 +24,7 @@ echo "installing packages"
 pip install dexom-python
 pip install miom[all]
 pip install snakemake
+pip install pulp==2.7.0
+pip  uninstall --yes gurobipy
 
 echo "installation complete"
