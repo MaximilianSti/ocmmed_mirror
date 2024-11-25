@@ -44,11 +44,6 @@ if __name__ == '__main__':
     model_keep = dexom_python.read_model(modelpath, solver=mp['solver'])
     model_keep = dexom_python.check_model_options(model_keep, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
                                                   mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
-    new_model = model_keep.copy()
-    if doc['force_active_reactions']:
-        force_active_rxns(new_model, doc['force_active_reactions'], doc['fluxvalue'])
-    if doc['force_flux_bounds']:
-        force_reaction_bounds(new_model, doc['force_flux_bounds'])
     # read and process gene expression file
     genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
@@ -60,9 +55,13 @@ if __name__ == '__main__':
         genes = dexom_python.expression2qualitative(genes=genes, column_list=gene_conditions,
                                                     proportion=doc['gpr_parameters']['percentile'],
                                                     outpath=outpath+'geneweights_qualitative')
-
     dexom_sols = []
     for condition in gene_conditions:
+        new_model = model_keep.copy()
+        if doc['force_flux_bounds']:
+            force_reaction_bounds(new_model, doc['force_flux_bounds'], condition)
+        if doc['force_active_reactions']:
+            force_active_rxns(new_model, doc['force_active_reactions'], doc['fluxvalue'], condition)
         # create reaction weights from gene expression
         print('computing reaction weights for condition '+condition)
         gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)

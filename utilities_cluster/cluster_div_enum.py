@@ -56,9 +56,9 @@ if __name__ == '__main__':
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
     if doc['force_flux_bounds']:
-        force_reaction_bounds(model, doc['force_flux_bounds'])
+        force_reaction_bounds(model, doc['force_flux_bounds'], condition)
     if doc['force_active_reactions']:
-        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
+        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'], condition)
     rw = dexom_python.load_reaction_weights(filename=outpath + 'reaction_weights_%s.csv' % condition)
 
     # prevsol, prevbin = dexom_python.read_solution(outpath + 'imat_solution_%s.csv' % condition)

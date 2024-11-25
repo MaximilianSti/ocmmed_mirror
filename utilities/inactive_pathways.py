@@ -27,10 +27,10 @@ cobra_config.solver = 'cplex'
 
 def compute_inactive_pathways(model):
     fullmodel = dexom_python.read_model(modelpath)
-    if doc['force_flux_bounds']:
-        force_reaction_bounds(fullmodel, doc['force_flux_bounds'])
-    if doc['force_active_reactions']:
-        force_active_rxns(fullmodel, doc['force_active_reactions'], doc['fluxvalue'])
+    if isinstance(['force_flux_bounds'], dict):
+        force_reaction_bounds(model, doc['force_flux_bounds'])
+    if isinstance(['force_active_reactions'], list):
+        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
     rxns_cell = set([r.id for r in model.reactions])
     rxns_full = set([r.id for r in fullmodel.reactions])
     if params['blocked_rxns']:

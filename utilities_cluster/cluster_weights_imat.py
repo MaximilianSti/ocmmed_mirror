@@ -77,9 +77,9 @@ if __name__ == '__main__':
 
     print('performing iMAT for condition ' + condition)
     if doc['force_flux_bounds']:
-        force_reaction_bounds(model, doc['force_flux_bounds'])
+        force_reaction_bounds(model, doc['force_flux_bounds'], condition)
     if doc['force_active_reactions']:
-        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
+        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'], condition)
 
     solver_ready = True
     if clus['force_cplex'] and not hasattr(optlang, 'cplex_interface'):

@@ -57,22 +57,23 @@ if __name__ == '__main__':
     condition = args.condition
 
     if doc['force_flux_bounds']:
-        force_reaction_bounds(model, doc['force_flux_bounds'])
+        force_reaction_bounds(model, doc['force_flux_bounds'], condition)
     if doc['force_active_reactions']:
-        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
+        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'], condition)
 
     rw = dexom_python.load_reaction_weights(filename=outpath+'reaction_weights_%s.csv' % condition)
     imatsol, imatbin = dexom_python.read_solution(filename=outpath+'imat_solution_%s.csv' % condition)
 
     if rp['reaction_list']:
         df = pd.read_csv(rp['reaction_list'], header=None)
+        reactions = [x for x in df.unstack().values]
+        wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
+        for rid in wrongrids:
+            warn('reaction %s is not in the model, this reaction will be skipped' % rid)
+        reactions = list(set(reactions) - set(wrongrids))
     else:
-        df = pd.read_csv(outpath + model.id + '_reactions_shuffled.csv', header=None)
-    reactions = [x for x in df.unstack().values]
-    wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
-    for rid in wrongrids:
-        warn('reaction %s is not in the model, this reaction will be skipped' % rid)
-    reactions = list(set(reactions) - set(wrongrids))
+        UserWarning('Found no reaction list, reaction-enumeration will take reactions in order (not recommended)')
+        reactions = [r.id for r in model.reactions]
 
     if params['blocked_rxns']:
         seps = ['\t', ';', ',', '\n']  # list of potential separators for the file

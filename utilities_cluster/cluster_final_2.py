@@ -40,9 +40,9 @@ cobra_config.solver = 'cplex'
 
 if __name__ == '__main__':
     model = dexom_python.read_model(doc['modelpath'], solver='cplex')
-    if doc['force_flux_bounds']:
+    if isinstance(['force_flux_bounds'], dict):
         force_reaction_bounds(model, doc['force_flux_bounds'])
-    if doc['force_active_reactions']:
+    if isinstance(['force_active_reactions'], list):
         force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
     frequencies = pd.read_csv(outpath + 'activation_frequency_reactions.csv', index_col=0)
     freq = frequencies[frequencies.columns[0]]

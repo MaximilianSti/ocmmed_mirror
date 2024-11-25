@@ -44,11 +44,11 @@ force_flux_bounds:
 # this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
 
 force_active_reactions:
-  examplereaction
+  - MAR09931
 # manually define reactions that must carry flux, and their minimum flux value
 # particularly useful for reversible reactions that could carry flux in either direction
-# this can also be a text file containing reaction ideas
-fluxvalue: 1e-3
+# this can also be a text file containing reaction ids
+fluxvalue: 1.0
 # 'fluxvalue' is the absolute value that the minimal flux should have
 
 
