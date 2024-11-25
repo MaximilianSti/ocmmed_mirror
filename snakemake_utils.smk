@@ -47,7 +47,3 @@ def get_conditions():
 def get_parallel():
     return list(range(clus['batch_num']))
 
-if not pad['rxn_enum_params']['reaction_list']:
-    m = dp.read_model(doc['modelpath'])
-    dp.model_functions.get_all_reactions_from_model(m, save=True, shuffle=True, out_path=outpath)
-
