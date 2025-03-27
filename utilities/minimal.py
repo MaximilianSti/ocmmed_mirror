@@ -17,6 +17,9 @@ def maximal_frequency(model_keep, frequency_table, essential_reactions):
     vals = list(set(frequencies.values))
     vals.sort(reverse=True)
 
+    if essential_reactions is None:
+        essential_reactions=[]
+
     allrecs = [r.id for r in model_keep.reactions]
     wrongrids = [rid for rid in essential_reactions if rid not in allrecs]
     for rid in wrongrids:
@@ -100,7 +103,7 @@ def maximal_frequency(model_keep, frequency_table, essential_reactions):
 
 if __name__ == '__main__':
     m = read_model('pilot_data/Human-GEM11.xml')
-    check_model_options(m, feasibility=1e-6)
+    check_model_options(m, tolerance=1e-6)
     sols = pd.read_csv('pilot_data/dexom_solutions.csv', index_col=0)
     freq = sols.sum()
 
