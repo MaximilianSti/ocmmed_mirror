@@ -48,7 +48,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # read model
     model_keep = dexom_python.read_model(modelpath, solver=mp['solver'])
-    model_keep = dexom_python.check_model_options(model_keep, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
+    model_keep = dexom_python.check_model_options(model_keep, timelimit=mp['timelimit'], tolerance=mp['tolerance'],
                                                   mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
     # read and process gene expression file
@@ -60,7 +60,7 @@ if __name__ == '__main__':
                                                     outpath=outpath+'geneweights_qualitative_%s' % condition)
     # create reaction weights from gene expression
     model = model_keep.copy()
-    model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
+    model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], tolerance=mp['tolerance'],
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     print('computing reaction weights for condition '+condition)
     gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)

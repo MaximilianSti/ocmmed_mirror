@@ -42,7 +42,7 @@ expressionfile = doc['expressionfile']
 if __name__ == '__main__':
     # read model
     model_keep = dexom_python.read_model(modelpath, solver=mp['solver'])
-    model_keep = dexom_python.check_model_options(model_keep, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
+    model_keep = dexom_python.check_model_options(model_keep, timelimit=mp['timelimit'], tolerance=mp['tolerance'],
                                                   mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     # read and process gene expression file
     genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         # compute imat solution from reaction weights
         print('performing iMAT for condition ' + condition)
         model = new_model.copy()
-        model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
+        model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], tolerance=mp['tolerance'],
                                                  mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
         with catch_warnings():
             filterwarnings('error')
@@ -91,7 +91,7 @@ if __name__ == '__main__':
                       'Attempting to find a solution without forced flux.')
                 model = model_keep.copy()
                 model = dexom_python.check_model_options(model, timelimit=mp['timelimit'],
-                                                         feasibility=mp['feasibility'],
+                                                         tolerance=mp['tolerance'],
                                                          mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
                 imatsol = dexom_python.imat(model=model, reaction_weights=rw, epsilon=ip['epsilon'],
                                             threshold=ip['threshold'])

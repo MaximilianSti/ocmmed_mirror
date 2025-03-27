@@ -8,8 +8,8 @@ model_params:
   # see instructions for cplex installation in the dexom_python documentation
   timelimit: 600
   # solver timelimit for each optimization step (in seconds). Leave empty for no timelimit
-  feasibility: 1e-7
-  # solver feasibility tolerance. Affects the speed of the solver
+  tolerance: 1e-7
+  # solver tolerances. Affects the speed of the solver
   mipgaptol: 1e-3
   # solver MIP gap tolerance. Affects the speed of the solver
   verbosity: 1
@@ -19,7 +19,7 @@ imat_params:
   epsilon: 3e-4
   # minimum flux value for reactions associated with highly expressed genes
   threshold: 2e-4
-  # threshold for determining whether a reaction is active or inactive (must be greater than solver feasibility)
+  # threshold for determining whether a reaction is active or inactive (must be greater than solver tolerance)
 
 enum_params:
   objective_tolerance: 1e-3

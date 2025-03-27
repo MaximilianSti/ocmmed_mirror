@@ -52,7 +52,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # read model
     model = dexom_python.read_model(modelpath, solver=mp['solver'])
-    model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], feasibility=mp['feasibility'],
+    model = dexom_python.check_model_options(model, timelimit=mp['timelimit'], tolerance=mp['tolerance'],
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
 
