@@ -56,9 +56,11 @@ fluxvalue: 1.0
 
 rxn_enum_iterations: 3
 div_enum_iterations: 3
-
 # number of iterations for reaction-enum and diversity-enum (if using the main.py script)
 
+full_rxn_enum: true
+# if set to true, this parameter forces reaction-enum to be applied on all reactions from the model
+# this will strongly increase computation times for large models, but maximizes the spread of starting points for the diversity-enum batches
 
 ### these parameters are for the network computation in the final step
 

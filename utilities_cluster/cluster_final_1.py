@@ -60,7 +60,10 @@ if __name__ == '__main__':
         
         div_sols.to_csv(cluspath + 'full_div_enum_solutions_%s.csv' % condition)
         div_fluxes.to_csv(cluspath + 'full_div_enum_fluxes_%s.csv' % condition)
-        rxn_sols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
+        rxn_enum_prefix = 'all_rxn_enum_'
+        if doc['full_rxn_enum']:
+            rxn_enum_prefix += 'full_'
+        rxn_sols = pd.read_csv(cluspath + rxn_enum_prefix + 'solutions_%s.csv' % condition, index_col=0)
         dexomsols = pd.concat([div_sols, rxn_sols]).drop_duplicates(ignore_index=True)
         dexomsols.to_csv(outpath + 'all_DEXOM_solutions_%s.csv' % condition)
         all_sols.append(dexomsols)

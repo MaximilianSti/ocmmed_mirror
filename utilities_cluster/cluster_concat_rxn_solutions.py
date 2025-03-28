@@ -36,6 +36,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     args = parser.parse_args()
 
+    prefix = 'rxn_enum_'
+    if doc['full_rxn_enum']:
+        prefix += 'full_'
+
+
     genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
     if doc['gene_expression_columns']:
@@ -44,14 +49,14 @@ if __name__ == '__main__':
         gene_conditions = genes.columns.to_list()
     for condition in gene_conditions:
         solutions = []
-        solfiles = Path(cluspath).glob('rxn_enum_solutions_%s_*.csv' % condition)
+        solfiles = Path(cluspath).glob(prefix + 'solutions_%s_*.csv' % condition)
         for f in solfiles:
             sol = pd.read_csv(f, index_col=0)
             solutions.append(sol)
         rxn_sols = pd.concat(solutions, ignore_index=True).drop_duplicates()
 
         fluxes = []
-        fluxfiles = Path(cluspath).glob('rxn_enum_fluxes_%s_*.csv' % condition)
+        fluxfiles = Path(cluspath).glob(prefix + 'fluxes_%s_*.csv' % condition)
         for f in fluxfiles:
             fl = pd.read_csv(f, index_col=0)
             fluxes.append(fl)
@@ -71,5 +76,11 @@ if __name__ == '__main__':
             rename_dic[j] = i
         new_sols = rxn_sols.rename(rename_dic).sort_index()  # exchange the first solutions with the center solutions
         new_fluxes = rxn_fluxes.rename(rename_dic).sort_index()
-        new_sols.to_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition)
-        new_fluxes.to_csv(cluspath + 'full_rxn_enum_fluxes_%s.csv' % condition)
+        rxn_enum_prefix = 'all_rxn_enum_'
+        if doc['full_rxn_enum']:
+            rxn_enum_prefix += 'full_'
+        new_sols.to_csv(cluspath + rxn_enum_prefix + 'solutions_%s.csv' % condition)
+        new_fluxes.to_csv(cluspath + rxn_enum_prefix + 'fluxes_%s.csv' % condition)
+        if doc['full_rxn_enum']:
+            with open(cluspath + 'fullrxnenumdone_%s.txt' %condition, 'w+') as file:
+                file.write(condition+' done')
