@@ -79,8 +79,8 @@ if __name__ == '__main__':
         rxn_enum_prefix = 'all_rxn_enum_'
         if doc['full_rxn_enum']:
             rxn_enum_prefix += 'full_'
-        new_sols.to_csv(cluspath + rxn_enum_prefix + 'solutions_%s.csv' % condition)
-        new_fluxes.to_csv(cluspath + rxn_enum_prefix + 'fluxes_%s.csv' % condition)
+        new_sols.to_csv(outpath + rxn_enum_prefix + 'solutions_%s.csv' % condition)
+        new_fluxes.to_csv(outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition)
         if doc['full_rxn_enum']:
             with open(cluspath + 'fullrxnenumdone_%s.txt' %condition, 'w+') as file:
                 file.write(condition+' done')

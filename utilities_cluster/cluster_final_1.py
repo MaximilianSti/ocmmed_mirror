@@ -58,8 +58,8 @@ if __name__ == '__main__':
         div_sols.reset_index(inplace=True, drop=True)
         div_fluxes.reset_index(inplace=True, drop=True)
         
-        div_sols.to_csv(cluspath + 'full_div_enum_solutions_%s.csv' % condition)
-        div_fluxes.to_csv(cluspath + 'full_div_enum_fluxes_%s.csv' % condition)
+        div_sols.to_csv(outpath + 'all_div_enum_solutions_%s.csv' % condition)
+        div_fluxes.to_csv(outpath + 'all_div_enum_fluxes_%s.csv' % condition)
         rxn_enum_prefix = 'all_rxn_enum_'
         if doc['full_rxn_enum']:
             rxn_enum_prefix += 'full_'

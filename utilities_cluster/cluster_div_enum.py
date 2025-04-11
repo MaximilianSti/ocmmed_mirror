@@ -43,7 +43,7 @@ modelpath = doc['modelpath']
 
 
 if __name__ == '__main__':
-    description = 'For a given condition calculates reaction weights and computes iMAT solution'
+    description = 'For a given condition and parallel batch id computes diversity-enumeration iterations'
     parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-c', '--condition', help='column of the gene expression file containing the data for one condition')
     parser.add_argument('-d', '--dist_anneal', type=float, default=-1., help='diversity-enum dist_anneal parameter')
@@ -67,8 +67,11 @@ if __name__ == '__main__':
             cluspath + 'rxn_enum_fluxes_%s_%s.csv' % (condition, args.parallel_id), model=model, rw=rw,
             eps=ip['epsilon'], thr=ip['threshold'], startsol=1)
     elif clus['approach'] == 'separate':
+        rxn_enum_prefix = 'all_rxn_enum_'
+        if doc['full_rxn_enum']:
+            rxn_enum_prefix += 'full_'
         prevsol, _ = dexom_python.enum_functions.read_prev_sol(
-            cluspath + 'full_rxn_enum_fluxes_%s.csv' % condition, model=model, rw=rw,
+            outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition, model=model, rw=rw,
             eps=ip['epsilon'], thr=ip['threshold'], startsol=int(args.parallel_id))
     else:
         warn("could not recognise approach, using iMAT solution as previous solution")

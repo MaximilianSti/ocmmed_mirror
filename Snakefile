@@ -24,7 +24,7 @@ rule concat_div_sols:
 rule div_enum:
     input:
         outpath+'reaction_weights_{condition}.csv',
-        cluspath + rxn_enum_prefix +'solutions_{condition}.csv'
+        outpath + rxn_enum_prefix +'solutions_{condition}.csv'
     output:
         cluspath+'div_enum_stats_{condition}_{parallel}.csv',
         cluspath+'div_enum_solutions_{condition}_{parallel}.csv'
@@ -37,7 +37,7 @@ rule concat_rxn_sols:
     input:
         expand(cluspath+'rxn_enum_solutions_{condition}_{parallel}.csv', condition=get_conditions(), parallel=get_parallel())
     output:
-        expand(cluspath+'all_rxn_enum_solutions_{condition}.csv', condition=get_conditions())
+        expand(outpath+'all_rxn_enum_solutions_{condition}.csv', condition=get_conditions())
     shell:
         'python utilities_cluster/cluster_concat_rxn_solutions.py'
 
@@ -56,7 +56,7 @@ rule concat_full_rxn_sols:
     input:
         expand(cluspath+'rxn_enum_full_solutions_{condition}_{parallel}.csv', condition=get_conditions(), parallel=get_batchnum())
     output:
-        expand(cluspath+'all_rxn_enum_full_solutions_{condition}.csv', condition=get_conditions()),
+        expand(outpath+'all_rxn_enum_full_solutions_{condition}.csv', condition=get_conditions()),
         expand(cluspath + 'fullrxnenumdone_{condition}.txt', condition=get_conditions())
     shell:
         'python utilities_cluster/cluster_concat_rxn_solutions.py'
