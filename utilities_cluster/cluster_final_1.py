@@ -63,7 +63,7 @@ if __name__ == '__main__':
         rxn_enum_prefix = 'all_rxn_enum_'
         if doc['full_rxn_enum']:
             rxn_enum_prefix += 'full_'
-        rxn_sols = pd.read_csv(cluspath + rxn_enum_prefix + 'solutions_%s.csv' % condition, index_col=0)
+        rxn_sols = pd.read_csv(outpath + rxn_enum_prefix + 'solutions_%s.csv' % condition, index_col=0)
         dexomsols = pd.concat([div_sols, rxn_sols]).drop_duplicates(ignore_index=True)
         dexomsols.to_csv(outpath + 'all_DEXOM_solutions_%s.csv' % condition)
         all_sols.append(dexomsols)
