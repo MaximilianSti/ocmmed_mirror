@@ -29,7 +29,7 @@ These commands indicate that this is a bash script, and when it is sent to the s
 
 ```
 cd $SLURM_SUBMIT_DIR  
-git clone https://forgemia.inra.fr/metexplore/cbm/ocmmed ocmmed 
+git clone https://forge.inrae.fr/metexplore/cbm/ocmmed ocmmed 
 cd ocmmed
 ```
 With these commands, the script will copy the ocmmed repository into the current directory, in a folder called "ocmmed".
