@@ -33,8 +33,6 @@ if clus['cluster_files']:
 else:
     cluspath = outpath
 
-    print('writing Snakefile')
-
 if doc['gene_expression_columns']:
     gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
 else:
@@ -47,3 +45,17 @@ def get_conditions():
 def get_parallel():
     return list(range(clus['batch_num']))
 
+def get_batchnum():
+    if pad['rxn_enum_params']['reaction_list']:
+        df = pd.read_csv(pad['rxn_enum_params']['reaction_list'], header=None)
+        reactions = [x for x in df.unstack().values]
+        batchnum = (len(reactions) // clus['batch_rxn_sols']) + 1
+    else:
+        raise NotImplementedError
+    return list(range(batchnum))
+
+final_output_full_rxn_enum = ''
+rxn_enum_prefix = 'all_rxn_enum_'
+if doc['full_rxn_enum']:
+    rxn_enum_prefix += 'full_'
+    final_output_full_rxn_enum = expand(cluspath + 'fullrxnenumdone_{condition}.txt', condition=get_conditions())

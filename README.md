@@ -7,7 +7,7 @@ Obtaining cell-specific metabolic models through enumeration with DEXOM
 - python packages in the `requirements.txt` file
 
 ## Installation
-The repository can be cloned with `git clone https://forgemia.inra.fr/metexplore/cbm/ocmmed.git` and installed with `python setup.py install`
+The repository can be cloned with `git clone https://forge.inrae.fr/metexplore/cbm/ocmmed` and installed with `python setup.py install`
 
 For the installation of the cluster pipeline, see [cluster instructions file](cluster_instructions.md).
 
@@ -46,4 +46,5 @@ Refer to the [cluster instructions file](cluster_instructions.md) for a detailed
 ![rulegraph](rulegraph.png)
 
 ## Versioning
+Current version: 1.1.2
 Version 1.0.2 is used for the cell-specific metabolic networks from the GOLIATH project: https://doi.org/10.3030/825489

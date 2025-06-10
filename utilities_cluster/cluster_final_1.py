@@ -58,11 +58,17 @@ if __name__ == '__main__':
         div_sols.reset_index(inplace=True, drop=True)
         div_fluxes.reset_index(inplace=True, drop=True)
         
-        div_sols.to_csv(cluspath + 'full_div_enum_solutions_%s.csv' % condition)
-        div_fluxes.to_csv(cluspath + 'full_div_enum_fluxes_%s.csv' % condition)
-        rxn_sols = pd.read_csv(cluspath + 'full_rxn_enum_solutions_%s.csv' % condition, index_col=0)
+        div_sols.to_csv(outpath + 'all_div_enum_solutions_%s.csv' % condition)
+        div_fluxes.to_csv(outpath + 'all_div_enum_fluxes_%s.csv' % condition)
+        rxn_enum_prefix = 'all_rxn_enum_'
+        if doc['full_rxn_enum']:
+            rxn_enum_prefix += 'full_'
+        rxn_sols = pd.read_csv(outpath + rxn_enum_prefix + 'solutions_%s.csv' % condition, index_col=0)
         dexomsols = pd.concat([div_sols, rxn_sols]).drop_duplicates(ignore_index=True)
         dexomsols.to_csv(outpath + 'all_DEXOM_solutions_%s.csv' % condition)
+        frequencies = dexomsols.sum()
+        frequencies.columns = ['frequency']
+        frequencies.to_csv(outpath + 'activation_frequency_reactions_%s.csv' % condition)
         all_sols.append(dexomsols)
     dex = pd.concat(all_sols).drop_duplicates(ignore_index=True)
     dex.to_csv(outpath + 'all_DEXOM_solutions.csv')
