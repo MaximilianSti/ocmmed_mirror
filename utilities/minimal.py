@@ -1,8 +1,8 @@
 import pandas as pd
-import miom
 from warnings import warn
 from cobra.io import write_sbml_model
 from dexom_python import read_model, check_model_options
+from cobra.flux_analysis.fastcc import fastcc
 
 
 def maximal_frequency(model_keep, frequency_table, essential_reactions):
@@ -40,11 +40,9 @@ def maximal_frequency(model_keep, frequency_table, essential_reactions):
             rem_rxns = [temp_model.reactions.get_by_id(r) for r in list(set(allrecs) - set(current_rxns))]
             temp_model.remove_reactions(rem_rxns)
 
-            miom_model = miom.load(miom.mio.cobra_to_miom(temp_model), 'cplex')
-            miom_model.steady_state().subset_selection(1).solve()
-            flux_consistent_model = miom_model.select_subnetwork()
+            flux_consistent_model = fastcc(temp_model)
 
-            if not False in [r in flux_consistent_model.network.R['id'] for r in essential_reactions]:
+            if not False in [r in flux_consistent_model.reactions for r in essential_reactions]:
                 print('tenth-step ends at iteration:', i)
                 indexes.append(i)
                 for rid in rxn_ids:
@@ -65,11 +63,9 @@ def maximal_frequency(model_keep, frequency_table, essential_reactions):
             rem_rxns = [temp_model.reactions.get_by_id(r) for r in list(set(allrecs) - set(current_rxns))]
             temp_model.remove_reactions(rem_rxns)
 
-            miom_model = miom.load(miom.mio.cobra_to_miom(temp_model), 'cplex')
-            miom_model.steady_state().subset_selection(1).solve()
-            flux_consistent_model = miom_model.select_subnetwork()
+            flux_consistent_model = fastcc(temp_model)
 
-            if not False in [r in flux_consistent_model.network.R['id'] for r in essential_reactions]:
+            if not False in [r in flux_consistent_model.reactions for r in essential_reactions]:
                 print('hundredth-step ends at iteration:', j)
                 indexes.append(j)
                 for rid in rxn_ids:
@@ -88,17 +84,12 @@ def maximal_frequency(model_keep, frequency_table, essential_reactions):
         rem_rxns = [temp_model.reactions.get_by_id(r) for r in list(set(allrecs) - set(current_rxns))]
         temp_model.remove_reactions(rem_rxns)
 
-        miom_model = miom.load(miom.mio.cobra_to_miom(temp_model), 'cplex')
-        miom_model.steady_state().subset_selection(1).solve()
-        flux_consistent_model = miom_model.select_subnetwork()
-        if not False in [r in flux_consistent_model.network.R['id'] for r in essential_reactions]:
+        flux_consistent_model = fastcc(temp_model)
+        if not False in [r in flux_consistent_model.reactions for r in essential_reactions]:
             print('reached frequency value:', v)
             break
-    new_model = model_keep.copy()
-    rem_recs = [x for i, x in zip(miom_model.variables.reaction_activity, miom_model.network.R['id']) if i == 0.]
-    new_model.remove_reactions(rem_recs, remove_orphans=True)
-    new_model.id += '_minimal'
-    return new_model
+    flux_consistent_model.id += '_minimal'
+    return flux_consistent_model
 
 
 if __name__ == '__main__':
