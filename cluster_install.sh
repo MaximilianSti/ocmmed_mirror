@@ -12,7 +12,7 @@ cd ocmmed
 echo "creating python environment'"
 
 module purge
-module load system/Python-3.7.4
+module load devel/python/Python-3.7.9
 
 pip install --upgrade pip
 
@@ -22,7 +22,6 @@ source env/bin/activate
 echo "installing packages"
 
 pip install dexom-python
-pip install miom[all]
 pip install snakemake
 pip install pulp==2.7.0
 pip  uninstall --yes gurobipy

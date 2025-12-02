@@ -7,20 +7,19 @@ from setuptools import setup, find_packages
 import sys
 
 requirements = [
-        'dexom-python',
-        'miom[all]']
+        'dexom-python']
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name='ocmmed',
-    version='0.1',
+    version='1.1.3',
     packages=find_packages('.'),
     install_requires=requirements,
     include_package_data=True,
     author='Maximilian Stingl',
-    author_email='maximilian.h.a.stingl@gmail.com',
+    author_email='contact-metexplore@inrae.fr',
     description='Obtaining cell-specific metabolic models through enumeration with DEXOM',
     long_description=long_description,
     long_description_content_type='text/markdown',
