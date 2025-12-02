@@ -6,18 +6,18 @@
 #SBATCH -c 8
 
 cd $SLURM_SUBMIT_DIR
-git clone https://forge.inrae.fr/metexplore/cbm/ocmmed ocmmed
+git clone https://forge.inrae.fr/metexplore/cbm/ocmmed.git ocmmed
 cd ocmmed
 
-echo "creating python environment'"
+echo "creating python environment"
 
 module purge
 module load devel/python/Python-3.7.9
 
-pip install --upgrade pip
-
 python -m venv env
 source env/bin/activate
+
+pip install --upgrade pip
 
 echo "installing packages"
 
