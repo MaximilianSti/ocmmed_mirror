@@ -61,20 +61,12 @@ if __name__ == '__main__':
         force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'], condition)
     rw = dexom_python.load_reaction_weights(filename=outpath + 'reaction_weights_%s.csv' % condition)
 
-    # prevsol, prevbin = dexom_python.read_solution(outpath + 'imat_solution_%s.csv' % condition)
-    if clus['approach'] == 'grouped':
-        prevsol, _ = dexom_python.enum_functions.read_prev_sol(
-            cluspath + 'rxn_enum_fluxes_%s_%s.csv' % (condition, args.parallel_id), model=model, rw=rw,
-            eps=ip['epsilon'], thr=ip['threshold'], startsol=1)
-    elif clus['approach'] == 'separate':
-        rxn_enum_prefix = 'all_rxn_enum_'
-        if doc['full_rxn_enum']:
-            rxn_enum_prefix += 'full_'
-        prevsol, _ = dexom_python.enum_functions.read_prev_sol(
-            outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition, model=model, rw=rw,
-            eps=ip['epsilon'], thr=ip['threshold'], startsol=int(args.parallel_id))
-    else:
-        warn("could not recognise approach, using iMAT solution as previous solution")
+    rxn_enum_prefix = 'all_rxn_enum_'
+    if doc['full_rxn_enum']:
+        rxn_enum_prefix += 'full_'
+    prevsol, _ = dexom_python.enum_functions.read_prev_sol(
+        outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition, model=model, rw=rw,
+        eps=ip['epsilon'], thr=ip['threshold'], startsol=int(args.parallel_id))
 
     if args.dist_anneal >= 0:
         distanneal = args.dist_anneal
