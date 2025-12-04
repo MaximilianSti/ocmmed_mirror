@@ -10,6 +10,6 @@ module load devel/python/Python-3.7.9
 source env/bin/activate
 export PYTHONPATH=${PYTHONPATH}:"/home/mstingl/save/CPLEX_Studio1210/cplex/python/3.7/x86-64_linux"
 
-#snakemake --forceall --dag | grep -v "Restricted*" | grep -v "No*" | dot -Tpdf > dag.pdf
+snakemake --forceall --rulegraph | grep -v "Restricted*" | grep -v "No*" | dot -Tpng > rulegraph.png
 snakemake --cluster "python3 submit.py {dependencies}" --immediate-submit --notemp -j 500
 

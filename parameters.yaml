@@ -44,7 +44,6 @@ force_flux_bounds:
 # this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
 
 force_active_reactions:
-  - MAR09931
 # manually define reactions that must carry flux, and their minimum flux value
 # particularly useful for reversible reactions that could carry flux in either direction
 # this can also be a text file containing reaction ids
@@ -58,7 +57,7 @@ rxn_enum_iterations: 3
 div_enum_iterations: 3
 # number of iterations for reaction-enum and diversity-enum (if using the main.py script)
 
-full_rxn_enum: true
+full_rxn_enum: false
 # if set to true, this parameter forces reaction-enum to be applied on all reactions from the model
 # this will strongly increase computation times for large models, but maximizes the spread of starting points for the diversity-enum batches
 

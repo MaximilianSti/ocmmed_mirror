@@ -22,7 +22,7 @@ imat_params:
   # threshold for determining whether a reaction is active or inactive (must be greater than solver tolerance)
 
 enum_params:
-  objective_tolerance: 1e-3
+  objective_tolerance: 0
   # tolerance for the objective function when searching for equally optimal solutions during the enumeration
   # if you are using discrete weights instead of qualitative weights, increase this parameter up to 1e-2 for faster runtimes
 
