@@ -14,7 +14,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='ocmmed',
-    version='1.1.4',
+    version='1.2.0',
     packages=find_packages('.'),
     install_requires=requirements,
     include_package_data=True,
