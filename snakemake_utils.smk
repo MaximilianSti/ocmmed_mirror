@@ -2,6 +2,7 @@ import ruamel.yaml as yaml
 import pandas as pd
 import os
 import dexom_python as dp
+import random
 
 # read configuration from YAML files
 yaml_reader = yaml.YAML(typ='safe')
@@ -45,13 +46,19 @@ def get_conditions():
 def get_parallel():
     return list(range(clus['batch_num']))
 
+if pad['rxn_enum_params']['reaction_list']:
+    df = pd.read_csv(pad['rxn_enum_params']['reaction_list'], header=None)
+    reactions = [x for x in df.unstack().values]
+else:
+    model = dp.read_model(doc['modelpath'])
+    reactions = [r.id for r in model.reactions]
+    random.shuffle(reactions)
+    with open(outpath + 'reactions_shuffled.txt', 'w+') as file:
+        file.write('\n'.join(reactions))
+
+
 def get_batchnum():
-    if pad['rxn_enum_params']['reaction_list']:
-        df = pd.read_csv(pad['rxn_enum_params']['reaction_list'], header=None)
-        reactions = [x for x in df.unstack().values]
-        batchnum = (len(reactions) // clus['batch_rxn_sols']) + 1
-    else:
-        raise NotImplementedError
+    batchnum = (len(reactions) // clus['batch_rxn_sols']) + 1
     return list(range(batchnum))
 
 final_output_full_rxn_enum = ''
