@@ -64,9 +64,10 @@ full_rxn_enum: false
 
 final_network: union
 # defines the method used for computing the network at the end of the workflow
-# must be either 'union' or 'minimal'
+# must be 'union' or 'minimal' or 'none'
 # 'union' contains all reactions which are active in at least one DEXOM solution
 # 'minimal' contains only the reactions which are active in every solution + the reactions necessary to make the network flux-consistent
+# 'none' will output the original model with no modifications
 
 union_cutoff: 0
 # only for the 'union' method

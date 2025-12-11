@@ -61,6 +61,8 @@ if __name__ == '__main__':
             model.remove_reactions(blocked, remove_orphans=True)
     elif doc['final_network'] == 'minimal':
         model = maximal_frequency(model_keep=model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
+    elif doc['final_network'] == 'none':
+        pass
     else:
         raise ValueError('Invalid value for "final_network" in parameters.yaml.')
     model.id += '_cellspecific'
