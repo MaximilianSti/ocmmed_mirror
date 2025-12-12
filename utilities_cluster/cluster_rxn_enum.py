@@ -59,7 +59,7 @@ if __name__ == '__main__':
     if rp['reaction_list']:
         df = pd.read_csv(rp['reaction_list'], header=None)
     else:
-        df = pd.read_vsc(outpath + 'reactions_shuffled.txt', header=None)
+        df = pd.read_csv(outpath + 'reactions_shuffled.txt', header=None)
     reactions = [x for x in df.unstack().values]
     wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
     for rid in wrongrids:

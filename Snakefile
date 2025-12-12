@@ -75,9 +75,19 @@ rule full_rxn_enum:
 rule weights_imat:
     input: 
         params['modelpath'],
-        params['expressionfile']
+        params['expressionfile'],
+        outpath + 'parameters_used_for_run.yaml'
     output:
         outpath+'reaction_weights_{condition}.csv',
         outpath+'imat_solution_{condition}.csv'
     shell:
         'python utilities_cluster/cluster_weights_imat.py -c "{wildcards.condition}"'
+
+rule preparation:
+    input:
+        params['modelpath'],
+        params['expressionfile']
+    output:
+        outpath + 'parameters_used_for_run.yaml'
+    shell:
+        'python utilities_cluster/cluster_preparation.py'

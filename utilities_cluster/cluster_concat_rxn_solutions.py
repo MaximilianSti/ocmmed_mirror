@@ -33,7 +33,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     prefix = 'rxn_enum_'
-    if params['full_rxn_enum']:
+    if params['rxn_enum_params']['full_rxn_enum']:
         prefix += 'full_'
 
 
@@ -72,11 +72,8 @@ if __name__ == '__main__':
             rename_dic[j] = i
         new_sols = rxn_sols.rename(rename_dic).sort_index()  # exchange the first solutions with the center solutions
         new_fluxes = rxn_fluxes.rename(rename_dic).sort_index()
-        rxn_enum_prefix = 'all_rxn_enum_'
-        if params['full_rxn_enum']:
-            rxn_enum_prefix += 'full_'
-        new_sols.to_csv(outpath + rxn_enum_prefix + 'solutions_%s.csv' % condition)
-        new_fluxes.to_csv(outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition)
+        new_sols.to_csv(outpath + 'all_' + prefix + 'solutions_%s.csv' % condition)
+        new_fluxes.to_csv(outpath + 'all_' + prefix + 'fluxes_%s.csv' % condition)
         if params['rxn_enum_params']['full_rxn_enum']:
             with open(cluspath + 'fullrxnenumdone_%s.txt' %condition, 'w+') as file:
                 file.write(condition+' done')
