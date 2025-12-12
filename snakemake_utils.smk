@@ -70,7 +70,7 @@ def get_batchnum():
 
 final_output_full_rxn_enum = ''
 rxn_enum_prefix = 'all_rxn_enum_'
-if params['full_rxn_enum']:
+if params['rxn_enum_params']['full_rxn_enum']:
     rxn_enum_prefix += 'full_'
     final_output_full_rxn_enum = expand(cluspath + 'fullrxnenumdone_{condition}.txt', condition=get_conditions())
 
