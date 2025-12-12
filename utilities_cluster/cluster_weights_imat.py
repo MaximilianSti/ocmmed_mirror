@@ -38,9 +38,9 @@ if __name__ == '__main__':
     # read and process gene expression file
     genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(params['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
-    if params['gpr_parameters']['qualitative'] and not params['reaction_scores']:
+    if params['gpr_qualitative'] and not params['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=[condition],
-                                                    proportion=params['gpr_parameters']['percentile'],
+                                                    proportion=params['gpr_percentile'],
                                                     outpath=outpath+'geneweights_qualitative_%s' % condition)
     # create reaction weights from gene expression
     model = model_keep.copy()
