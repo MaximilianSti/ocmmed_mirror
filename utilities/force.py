@@ -2,7 +2,9 @@ from warnings import warn
 import pandas as pd
 
 
-def force_active_rxns(model, rxns, fluxvalue=0.1, condition=None):
+def force_active_rxns(model, rxns, fluxvalue=1.0, condition=None):
+    if not isinstance(fluxvalue, (int, float)):
+        fluxvalue = 1.0
     if isinstance(rxns, list):
         rxnlist = rxns
     elif isinstance(rxns, str):

@@ -53,6 +53,7 @@ force_active_reactions:
 
 fluxvalue: 1.0
 # 'fluxvalue' is the absolute value that will be used for forcing flux in 'force_active_reactions'
+# Defaults to 1.0
 
 
 ### these parameters are for the network enumeration
