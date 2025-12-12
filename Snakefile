@@ -74,8 +74,8 @@ rule full_rxn_enum:
 
 rule weights_imat:
     input: 
-        doc['modelpath'],
-        doc['expressionfile']
+        params['modelpath'],
+        params['expressionfile']
     output:
         outpath+'reaction_weights_{condition}.csv',
         outpath+'imat_solution_{condition}.csv'
