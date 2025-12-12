@@ -4,6 +4,7 @@ import os
 import dexom_python as dp
 import random
 import time
+from pathlib import Path
 
 # read configuration from YAML files
 yaml_reader = yaml.YAML(typ='safe')
@@ -27,6 +28,14 @@ if params['cluster_files']:
 else:
     cluspath = outpath
 
+
+if not Path(params['modelpath']).exists():
+    raise FileNotFoundError('Model file not found, check if you provided the correct path: %s' % params['modelpath'])
+
+if not Path(params['expressionfile']).exists():
+    raise FileNotFoundError('Gene expression file not found, check if you provided the correct path: %s' % params['expressionfile'])
+
+
 if params['gene_expression_columns']:
     gene_conditions = [x.strip() for x in params['gene_expression_columns'].split(',')]
 else:
@@ -40,6 +49,8 @@ def get_parallel():
     return list(range(params['batch_num']))
 
 if params['rxn_enum_params']['reaction_list']:
+    if not Path(params['rxn_enum_params']['reaction_list']).exists():
+        raise FileNotFoundError('Reaction-list file not found, check if you provided the correct path: %s' % params['rxn_enum_params']['reaction_list'])
     df = pd.read_csv(params['rxn_enum_params']['reaction_list'], header=None)
     reactions = [x for x in df.unstack().values]
 else:
@@ -48,6 +59,10 @@ else:
     random.shuffle(reactions)
     with open(outpath + 'reactions_shuffled.txt', 'w+') as file:
         file.write('\n'.join(reactions))
+
+if params['blocked_reactions']:
+    if not Path(params['blocked_reactions']).exists():
+        raise FileNotFoundError('Blocked reaction file not found, check if you provided the correct path: %s' % params['blocked_reactions'])
 
 def get_batchnum():
     batchnum = (len(reactions) // params['batch_rxn_sols']) + 1
@@ -58,6 +73,16 @@ rxn_enum_prefix = 'all_rxn_enum_'
 if params['full_rxn_enum']:
     rxn_enum_prefix += 'full_'
     final_output_full_rxn_enum = expand(cluspath + 'fullrxnenumdone_{condition}.txt', condition=get_conditions())
+
+if isinstance(params['force_flux_bounds'], dict):
+    pass
+elif params['force_flux_bounds'] and not Path(params['force_flux_bounds']).exists():
+    raise FileNotFoundError('Flux bounds file not found, check if you provided the correct path: %s' % ['force_flux_bounds'])
+
+if isinstance(params['force_active_reactions'], dict):
+    pass
+elif params['force_active_reactions'] and not Path(params['force_active_reactions']).exists():
+    raise FileNotFoundError('Flux bounds file not found, check if you provided the correct path: %s' % ['force_active_reactions'])
 
 yaml_writer = yaml.YAML()
 with open(outpath + 'parameters_used_for_run_%.0f.yaml' % time.time(), 'w+') as file:
