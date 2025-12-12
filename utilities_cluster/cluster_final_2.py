@@ -13,41 +13,37 @@ from warnings import warn
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
-doc = yaml_reader.load(a)
+params = yaml_reader.load(a)
 
-with open('params_cluster.yaml', 'r') as file:
-    c = file.read()
-clus = yaml_reader.load(c)
-
-if doc['output_path']:
-    outpath = doc['output_path']
+if params['output_path']:
+    outpath = params['output_path']
     if outpath[-1] not in ['/', '\\']:
         outpath += '/'
 else:
     outpath = ''
 
-if clus['cluster_files']:
-    cluspath = clus['cluster_files']
+if params['cluster_files']:
+    cluspath = params['cluster_files']
     if cluspath[-1] not in ['/', '\\']:
         cluspath += '/'
 else:
     cluspath = outpath
 
-expressionfile = doc['expressionfile']
+expressionfile = params['expressionfile']
 cobra_config = Configuration()
 cobra_config.solver = 'cplex'
 
 
 if __name__ == '__main__':
-    model = dexom_python.read_model(doc['modelpath'], solver='cplex')
-    if isinstance(doc['force_flux_bounds'], dict):
-        force_reaction_bounds(model, doc['force_flux_bounds'])
-    if isinstance(doc['force_active_reactions'], list):
-        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'])
+    model = dexom_python.read_model(params['modelpath'], solver='cplex')
+    if isinstance(params['force_flux_bounds'], dict):
+        force_reaction_bounds(model, params['force_flux_bounds'])
+    if isinstance(params['force_active_reactions'], list):
+        force_active_rxns(model, params['force_active_reactions'], params['fluxvalue'])
     frequencies = pd.read_csv(outpath + 'activation_frequency_reactions.csv', index_col=0)
     freq = frequencies[frequencies.columns[0]]
-    if doc['final_network'] == 'union':
-        cutoff = doc['union_cutoff']
+    if params['final_network'] == 'union':
+        cutoff = params['union_cutoff']
         if isinstance(cutoff, str):
             if cutoff[-1] == '%':
                 cutoff = freq.max() * float(cutoff[:-1]) / 100
@@ -59,9 +55,9 @@ if __name__ == '__main__':
         if cutoff > 0:
             blocked = find_blocked_reactions(model)
             model.remove_reactions(blocked, remove_orphans=True)
-    elif doc['final_network'] == 'minimal':
-        model = maximal_frequency(model_keep=model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
-    elif doc['final_network'] == 'none':
+    elif params['final_network'] == 'minimal':
+        model = maximal_frequency(model_keep=model, frequency_table=frequencies, essential_reactions=params['force_active_reactions'])
+    elif params['final_network'] == 'none':
         pass
     else:
         raise ValueError('Invalid value for "final_network" in parameters.yaml.')

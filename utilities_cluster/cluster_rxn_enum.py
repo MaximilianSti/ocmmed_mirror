@@ -10,25 +10,17 @@ import optlang
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
-doc = yaml_reader.load(a)
+params = yaml_reader.load(a)
 
-with open('params_additional.yaml', 'r') as file:
-    b = file.read()
-params = yaml_reader.load(b)
-
-with open('params_cluster.yaml', 'r') as file:
-    c = file.read()
-clus = yaml_reader.load(c)
-
-if doc['output_path']:
-    outpath = doc['output_path']
+if params['output_path']:
+    outpath = params['output_path']
     if outpath[-1] not in ['/', '\\']:
         outpath += '/'
 else:
     outpath = ''
 
-if clus['cluster_files']:
-    cluspath = clus['cluster_files']
+if params['cluster_files']:
+    cluspath = params['cluster_files']
     if cluspath[-1] not in ['/', '\\']:
         cluspath += '/'
 else:
@@ -39,7 +31,7 @@ ip = params['imat_params']
 ep = params['enum_params']
 rp = params['rxn_enum_params']
 
-modelpath = doc['modelpath']
+modelpath = params['modelpath']
 
 
 if __name__ == '__main__':
@@ -56,24 +48,23 @@ if __name__ == '__main__':
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
 
-    if doc['force_flux_bounds']:
-        force_reaction_bounds(model, doc['force_flux_bounds'], condition)
-    if doc['force_active_reactions']:
-        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'], condition)
+    if params['force_flux_bounds']:
+        force_reaction_bounds(model, params['force_flux_bounds'], condition)
+    if params['force_active_reactions']:
+        force_active_rxns(model, params['force_active_reactions'], params['fluxvalue'], condition)
 
     rw = dexom_python.load_reaction_weights(filename=outpath+'reaction_weights_%s.csv' % condition)
     imatsol, imatbin = dexom_python.read_solution(filename=outpath+'imat_solution_%s.csv' % condition)
 
     if rp['reaction_list']:
         df = pd.read_csv(rp['reaction_list'], header=None)
-        reactions = [x for x in df.unstack().values]
-        wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
-        for rid in wrongrids:
-            warn('reaction %s is not in the model, this reaction will be skipped' % rid)
-        reactions = list(set(reactions) - set(wrongrids))
     else:
-        UserWarning('Found no reaction list, reaction-enumeration will take reactions in order (not recommended)')
-        reactions = [r.id for r in model.reactions]
+        df = pd.read_vsc(outpath + 'reactions_shuffled.txt', header=None)
+    reactions = [x for x in df.unstack().values]
+    wrongrids = [rid for rid in reactions if rid not in [r.id for r in model.reactions]]
+    for rid in wrongrids:
+        warn('reaction %s is not in the model, this reaction will be skipped' % rid)
+    reactions = list(set(reactions) - set(wrongrids))
 
     if params['blocked_rxns']:
         seps = ['\t', ';', ',', '\n']  # list of potential separators for the file
@@ -96,7 +87,7 @@ if __name__ == '__main__':
         rxn_list = reactions[start:int(rxn_range[1])]
 
     solver_ready = True
-    if clus['force_cplex'] and not hasattr(optlang, 'cplex_interface'):
+    if params['force_cplex'] and not hasattr(optlang, 'cplex_interface'):
         solver_ready = False
 
     if solver_ready:
@@ -111,7 +102,7 @@ if __name__ == '__main__':
     uniques = pd.DataFrame(rxnsol.unique_binary)
     uniques.columns = [r.id for r in model.reactions]
     prefix = 'rxn_enum_'
-    if doc['full_rxn_enum']:
+    if params['full_rxn_enum']:
         prefix += 'full_'
     uniques.to_csv(cluspath + prefix + 'solutions_%s_%s.csv' % (condition, args.parallel_id))
     fluxes = pd.concat([s.fluxes for s in rxnsol.unique_solutions], axis=1).T.reset_index().drop('index', axis=1)

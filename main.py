@@ -15,14 +15,11 @@ import os
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
-doc = yaml_reader.load(a)
+params = yaml_reader.load(a)
 
-with open('params_additional.yaml', 'r') as file:
-    b = file.read()
-params = yaml_reader.load(b)
 
-if doc['output_path']:
-    outpath = doc['output_path']
+if params['output_path']:
+    outpath = params['output_path']
     os.makedirs(outpath, exist_ok=True)
     if outpath[-1] not in ['/', '\\']:
         outpath += '/'
@@ -35,8 +32,8 @@ ep = params['enum_params']
 rp = params['rxn_enum_params']
 dp = params['div_enum_params']
 
-modelpath = doc['modelpath']
-expressionfile = doc['expressionfile']
+modelpath = params['modelpath']
+expressionfile = params['expressionfile']
 
 
 if __name__ == '__main__':
@@ -45,34 +42,34 @@ if __name__ == '__main__':
     model_keep = dexom_python.check_model_options(model_keep, timelimit=mp['timelimit'], tolerance=mp['tolerance'],
                                                   mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     # read and process gene expression file
-    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(params['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
-    if doc['gene_expression_columns']:
-        gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
+    if params['gene_expression_columns']:
+        gene_conditions = [x.strip() for x in params['gene_expression_columns'].split(',')]
     else:
         gene_conditions = genes.columns.to_list()
-    if doc['gpr_parameters']['qualitative'] and not doc['reaction_scores']:
+    if params['gpr_qualitative'] and not params['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=gene_conditions,
-                                                    proportion=doc['gpr_parameters']['percentile'],
+                                                    proportion=params['gpr_percentile'],
                                                     outpath=outpath+'geneweights_qualitative')
     dexom_sols = []
     for condition in gene_conditions:
         new_model = model_keep.copy()
-        if doc['force_flux_bounds']:
-            force_reaction_bounds(new_model, doc['force_flux_bounds'], condition)
-        if doc['force_active_reactions']:
-            force_active_rxns(new_model, doc['force_active_reactions'], doc['fluxvalue'], condition)
+        if params['force_flux_bounds']:
+            force_reaction_bounds(new_model, params['force_flux_bounds'], condition)
+        if params['force_active_reactions']:
+            force_active_rxns(new_model, params['force_active_reactions'], params['fluxvalue'], condition)
         # create reaction weights from gene expression
         print('computing reaction weights for condition '+condition)
         gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)
 
-        if doc['reaction_scores']:
+        if params['reaction_scores']:
             rw = {}
             for rxn in model_keep.reactions:
                 rw[rxn.id] = float(gene_weights.to_dict().get(rxn.id, 0.))
             dexom_python.save_reaction_weights(rw, outpath+'reaction_weights_%s' % condition)
         else:
-            rw = dexom_python.apply_gpr(model=model_keep, gene_weights=gene_weights, duplicates=doc['duplicates'],
+            rw = dexom_python.apply_gpr(model=model_keep, gene_weights=gene_weights, duplicates=params['duplicates'],
                                         save=True, filename=outpath+'reaction_weights_%s' % condition)
 
         # compute imat solution from reaction weights
@@ -120,7 +117,7 @@ if __name__ == '__main__':
                 reader = reader.replace(sep, ' ')
             rxns_inactive = reader.split()
             reactions = list(set(reactions) - set(rxns_inactive))
-        rxnlist = reactions[:doc['rxn_enum_iterations']]
+        rxnlist = reactions[:params['rxn_enum_iterations']]
         rxnsol = dexom_python.enum_functions.rxn_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
                                                       rxn_list=rxnlist,obj_tol=ep['objective_tolerance'],
                                                       eps=ip['epsilon'], thr=ip['threshold'])
@@ -133,7 +130,7 @@ if __name__ == '__main__':
         print('performing diversity-enumeration for condition ' + condition)
         divsol, divres = dexom_python.enum_functions.diversity_enum(model=model, reaction_weights=rw, prev_sol=imatsol,
                                 dist_anneal=dp['dist_anneal'], eps=ip['epsilon'], thr=ip['threshold'], icut=dp['icut'],
-                                maxiter=doc['div_enum_iterations'], obj_tol=ep['objective_tolerance'],  full=dp['full'])
+                                maxiter=params['div_enum_iterations'], obj_tol=ep['objective_tolerance'],  full=dp['full'])
         divs = pd.DataFrame(divsol.binary)
         divs.columns = [r.id for r in model.reactions]
         divs.to_csv(outpath+'div_enum_solutions_%s.csv' % condition)
@@ -150,8 +147,8 @@ if __name__ == '__main__':
     frequencies.to_csv(outpath + 'activation_frequency_reactions.csv')
 
     print('producing final network')
-    if doc['final_network'] == 'union':
-        cutoff = doc['union_cutoff']
+    if params['final_network'] == 'union':
+        cutoff = params['union_cutoff']
         if isinstance(cutoff, str):
             if cutoff[-1] == '%':
                 cutoff = frequencies.max() * float(cutoff[:-1]) / 100
@@ -163,8 +160,8 @@ if __name__ == '__main__':
         if cutoff > 0:
             blocked_reactions = find_blocked_reactions(new_model)
             new_model.remove_reactions(blocked_reactions, remove_orphans=True)
-    elif doc['final_network'] == 'minimal':
-        new_model = maximal_frequency(model_keep=new_model, frequency_table=frequencies, essential_reactions=doc['force_active_reactions'])
+    elif params['final_network'] == 'minimal':
+        new_model = maximal_frequency(model_keep=new_model, frequency_table=frequencies, essential_reactions=params['force_active_reactions'])
     else:
         warn('Invalid value for "final_network" in parameters.yaml, returning original network.')
     new_model.id += '_cellspecific'

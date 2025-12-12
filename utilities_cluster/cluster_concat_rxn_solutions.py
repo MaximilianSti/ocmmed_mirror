@@ -8,27 +8,23 @@ from sklearn.cluster import KMeans
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
-doc = yaml_reader.load(a)
+params = yaml_reader.load(a)
 
-with open('params_cluster.yaml', 'r') as file:
-    c = file.read()
-clus = yaml_reader.load(c)
-
-if doc['output_path']:
-    outpath = doc['output_path']
+if params['output_path']:
+    outpath = params['output_path']
     if outpath[-1] not in ['/', '\\']:
         outpath += '/'
 else:
     outpath = ''
 
-if clus['cluster_files']:
-    cluspath = clus['cluster_files']
+if params['cluster_files']:
+    cluspath = params['cluster_files']
     if cluspath[-1] not in ['/', '\\']:
         cluspath += '/'
 else:
     cluspath = outpath
 
-expressionfile = doc['expressionfile']
+expressionfile = params['expressionfile']
 
 
 if __name__ == '__main__':
@@ -37,14 +33,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     prefix = 'rxn_enum_'
-    if doc['full_rxn_enum']:
+    if params['full_rxn_enum']:
         prefix += 'full_'
 
 
-    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(params['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
-    if doc['gene_expression_columns']:
-        gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
+    if params['gene_expression_columns']:
+        gene_conditions = [x.strip() for x in params['gene_expression_columns'].split(',')]
     else:
         gene_conditions = genes.columns.to_list()
     for condition in gene_conditions:
@@ -65,7 +61,7 @@ if __name__ == '__main__':
         rxn_sols.reset_index(inplace=True, drop=True)
         rxn_fluxes.reset_index(inplace=True, drop=True)
 
-        clustering = KMeans(n_clusters=clus['batch_num']).fit(rxn_sols)  # form batch_num kmeans clusters
+        clustering = KMeans(n_clusters=params['batch_num']).fit(rxn_sols)  # form batch_num kmeans clusters
         clusterdf = pd.DataFrame(clustering.transform(rxn_sols))
         sol_index = clusterdf.idxmin().values.tolist()  # we take the solution closest to each cluster center
         first_pos = list(set(range(10)) - set(sol_index))
@@ -77,10 +73,10 @@ if __name__ == '__main__':
         new_sols = rxn_sols.rename(rename_dic).sort_index()  # exchange the first solutions with the center solutions
         new_fluxes = rxn_fluxes.rename(rename_dic).sort_index()
         rxn_enum_prefix = 'all_rxn_enum_'
-        if doc['full_rxn_enum']:
+        if params['full_rxn_enum']:
             rxn_enum_prefix += 'full_'
         new_sols.to_csv(outpath + rxn_enum_prefix + 'solutions_%s.csv' % condition)
         new_fluxes.to_csv(outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition)
-        if doc['full_rxn_enum']:
+        if params['full_rxn_enum']:
             with open(cluspath + 'fullrxnenumdone_%s.txt' %condition, 'w+') as file:
                 file.write(condition+' done')

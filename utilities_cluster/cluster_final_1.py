@@ -7,36 +7,32 @@ from cobra import Configuration
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
-doc = yaml_reader.load(a)
+params = yaml_reader.load(a)
 
-with open('params_cluster.yaml', 'r') as file:
-    c = file.read()
-clus = yaml_reader.load(c)
-
-if doc['output_path']:
-    outpath = doc['output_path']
+if params['output_path']:
+    outpath = params['output_path']
     if outpath[-1] not in ['/', '\\']:
         outpath += '/'
 else:
     outpath = ''
 
-if clus['cluster_files']:
-    cluspath = clus['cluster_files']
+if params['cluster_files']:
+    cluspath = params['cluster_files']
     if cluspath[-1] not in ['/', '\\']:
         cluspath += '/'
 else:
     cluspath = outpath
 
-expressionfile = doc['expressionfile']
+expressionfile = params['expressionfile']
 cobra_config = Configuration()
 cobra_config.solver = 'cplex'
 
 
 if __name__ == '__main__':
-    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(params['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
-    if doc['gene_expression_columns']:
-        gene_conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
+    if params['gene_expression_columns']:
+        gene_conditions = [x.strip() for x in params['gene_expression_columns'].split(',')]
     else:
         gene_conditions = genes.columns.to_list()
     all_sols = []
@@ -61,7 +57,7 @@ if __name__ == '__main__':
         div_sols.to_csv(outpath + 'all_div_enum_solutions_%s.csv' % condition)
         div_fluxes.to_csv(outpath + 'all_div_enum_fluxes_%s.csv' % condition)
         rxn_enum_prefix = 'all_rxn_enum_'
-        if doc['full_rxn_enum']:
+        if params['full_rxn_enum']:
             rxn_enum_prefix += 'full_'
         rxn_sols = pd.read_csv(outpath + rxn_enum_prefix + 'solutions_%s.csv' % condition, index_col=0)
         dexomsols = pd.concat([div_sols, rxn_sols]).drop_duplicates(ignore_index=True)
@@ -73,7 +69,7 @@ if __name__ == '__main__':
     dex = pd.concat(all_sols).drop_duplicates(ignore_index=True)
     dex.to_csv(outpath + 'all_DEXOM_solutions.csv')
     print("concatenated all DEXOM solutions")
-    model = dexom_python.read_model(doc['modelpath'], solver='cplex')
+    model = dexom_python.read_model(params['modelpath'], solver='cplex')
     dex.columns = [r.id for r in model.reactions]
     frequencies = dex.sum()
     frequencies.columns = ['frequency']

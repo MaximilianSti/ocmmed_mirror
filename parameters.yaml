@@ -3,8 +3,10 @@
 
 modelpath: pilot_data/Human-GEM11.xml
 # must be a valid cobrapy model (either .xml, .json, or .mat)
+
 expressionfile: pilot_data/gene_IDs_meanvalues.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
+
 output_path: pilot_data_results
 # path to a folder in which the output files will be saved. If the folder does not exist, it will be created
 
@@ -17,19 +19,21 @@ reaction_scores: false
 
 gene_ID_column: ID
 # name of the column containing gene IDs
+
 gene_expression_columns:
 # names of the columns containing gene expression data
 # column names must be separated by commas (example: condition1,condition2,condition3)
 # if empty, all columns (except the gene_ID_column) will be used
+
 duplicates: remove
 # how to deal with genes for which several values are present in the expression file, in case these values have conflicting information
 # possible methods: "remove", "min", "max", "mean", "median"
-gpr_parameters:
-  # parameters for the gene-protein-reaction rules
-  qualitative: true
+
+gpr_qualitative: true
   # if true, the gene expression will be converted to reaction weights -1/0/1
   # if false, the expression will directly be mapped to the reactions
-  percentile: 0.25
+
+gpr_percentile: 0.25
   # the percentile cutoff for low/high gene expression (this is only used if qualitative: true)
   # example: with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
 
@@ -46,8 +50,9 @@ force_active_reactions:
 # manually define reactions that must carry flux, and their minimum flux value
 # particularly useful for reversible reactions that could carry flux in either direction
 # this can also be a text file containing reaction ids
+
 fluxvalue: 1.0
-# 'fluxvalue' is the absolute value that the minimal flux should have
+# 'fluxvalue' is the absolute value that will be used for forcing flux in 'force_active_reactions'
 
 
 ### these parameters are for the network enumeration
@@ -72,3 +77,94 @@ final_network: union
 union_cutoff: 0
 # only for the 'union' method
 # for a given reaction, if the number of solutions in which it is active <= union_cutoff, then this reaction is ignored
+
+
+#### CLUSTER PARAMETERS #####
+
+
+cluster_files: pilot_data_cluster_files
+# path to a folder where various files will be saved for the cluster computation
+# if the folder does not exist, it will be created
+# recommendation: use 2 different folders for cluster_files and output_path
+
+batch_num: 10
+# number of parallel batches for each condition
+
+batch_rxn_sols: 10
+# number of reaction-enum solutions per batch
+
+batch_div_sols: 10
+# number of diversity-enum solutions per batch
+
+cores: 12
+# number of cores to assign for each job
+
+memory: 48
+# allocated memory per job in gigabytes
+
+time: 10:00:00
+# maximum allowed runtime per job in hours:minutes:seconds
+
+emails: false
+# if true, you will receive an email alert everytime a batch starts and ends
+# if false, you will only receive no email alerts
+
+force_cplex: true
+# if True, the optimizations will be run only if the cplex solver is available
+
+suppress_slurmfiles: true
+# when set to "true", suppresses the slurm output files in the format "slurm-[jobID].out"
+# this is useful to avoid cluttering the cluster folder with many redundant output files
+# but if an error occurs the error message won't appear in the logs.
+
+
+#### ADDITIONAL PARAMETERS FOR ADVANCES USERS ####
+
+
+### This file contains parameters which can be modified if needed
+# parameters with the tag OPTIONAL can be left empty if the file is not present
+
+model_params:
+  solver: cplex
+  # must be a solver supported by cobrapy (currently: either cplex, glpk or gurobi), and must be correctly installed
+  # see instructions for cplex installation in the dexom_python documentation
+  timelimit: 600
+  # solver timelimit for each optimization step (in seconds). Leave empty for no timelimit
+  tolerance: 1e-7
+  # solver tolerances. Affects the speed of the solver
+  mipgaptol: 1e-3
+  # solver MIP gap tolerance. Affects the speed of the solver
+  verbosity: 1
+  # solver verbosity (1 for no solver output, 2 for warnings, 3 for full solver output)
+
+imat_params:
+  epsilon: 3e-4
+  # minimum flux value for reactions associated with highly expressed genes
+  threshold: 2e-4
+  # threshold for determining whether a reaction is active or inactive (must be greater than solver tolerance)
+
+enum_params:
+  objective_tolerance: 0
+  # tolerance for the objective function when searching for equally optimal solutions during the enumeration
+  # if you are using discrete weights instead of qualitative weights, increase this parameter up to 1e-2 for faster runtimes
+
+rxn_enum_params:
+  reaction_list: pilot_data/HumanGEM11_reactions_shuffled.csv
+  # OPTIONAL
+  # providing a curated list of non-essential, non-blocked reactions in a shuffled order improves the performance of the reaction-enum method
+  # if left empty, a shuffled reaction list will be generated automatically, but blocked and essential reactions will not be excluded
+
+div_enum_params:
+  dist_anneal: 0.9
+  # parameter for controlling the distance between each successive diversity-enum solution
+  # This parameter is ignored in the cluster pipeline, as it will be calculated based on the number of batches and iterations
+  icut: true
+  # if true, will apply integer-cut constraints. This will prevent diversity-enum from finding duplicate solutions
+  full: false
+  # if true, will use the full-DEXOM implementation (see dexom-python documentation).
+  # This very significantly increases the computation time per iteration and should only be done on small models
+
+blocked_rxns: pilot_data/human-gem11_blocked.txt
+# OPTIONAL
+# provide a list of reactions which are blocked in the model.
+# This will be used for determining which reactions are inactive in the cell-specific model

@@ -9,18 +9,10 @@ from warnings import warn, filterwarnings, resetwarnings, catch_warnings
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
     a = file.read()
-doc = yaml_reader.load(a)
+params = yaml_reader.load(a)
 
-with open('params_additional.yaml', 'r') as file:
-    b = file.read()
-params = yaml_reader.load(b)
-
-with open('params_cluster.yaml', 'r') as file:
-    c = file.read()
-clus = yaml_reader.load(c)
-
-if doc['output_path']:
-    outpath = doc['output_path']
+if params['output_path']:
+    outpath = params['output_path']
     if outpath[-1] not in ['/', '\\']:
         outpath += '/'
 else:
@@ -30,16 +22,8 @@ mp = params['model_params']
 ip = params['imat_params']
 ep = params['enum_params']
 
-modelpath = doc['modelpath']
-expressionfile = doc['expressionfile']
-
-yaml_writer = yaml.YAML()
-saveparams = doc.copy()
-saveparams.update(params)
-saveparams.update(clus)
-with open(outpath + 'parameters_used_for_run.yaml', 'w+') as file:
-    yaml_writer.dump(saveparams, file)
-
+modelpath = params['modelpath']
+expressionfile = params['expressionfile']
 
 if __name__ == '__main__':
     description = 'For a given condition calculates reaction weights and computes iMAT solution'
@@ -52,11 +36,11 @@ if __name__ == '__main__':
                                                   mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     condition = args.condition
     # read and process gene expression file
-    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
+    genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(params['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
-    if doc['gpr_parameters']['qualitative'] and not doc['reaction_scores']:
+    if params['gpr_parameters']['qualitative'] and not params['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=[condition],
-                                                    proportion=doc['gpr_parameters']['percentile'],
+                                                    proportion=params['gpr_parameters']['percentile'],
                                                     outpath=outpath+'geneweights_qualitative_%s' % condition)
     # create reaction weights from gene expression
     model = model_keep.copy()
@@ -64,22 +48,22 @@ if __name__ == '__main__':
                                              mipgaptol=mp['mipgaptol'], verbosity=mp['verbosity'])
     print('computing reaction weights for condition '+condition)
     gene_weights = pd.Series(genes[condition].values, index=genes.index, dtype=float)
-    if doc['reaction_scores']:
+    if params['reaction_scores']:
         rw = {}
         for rxn in model.reactions:
             rw[rxn.id] = float(gene_weights.to_dict().get(rxn.id, 0.))
         dexom_python.save_reaction_weights(rw, outpath + 'reaction_weights_%s.csv' % condition)
     else:
-        rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=doc['duplicates'], save=True,
+        rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=params['duplicates'], save=True,
                                     filename=outpath+'reaction_weights_%s' % condition)
 
     # compute imat solution from reaction weights
 
     print('performing iMAT for condition ' + condition)
-    if doc['force_flux_bounds']:
-        force_reaction_bounds(model, doc['force_flux_bounds'], condition)
-    if doc['force_active_reactions']:
-        force_active_rxns(model, doc['force_active_reactions'], doc['fluxvalue'], condition)
+    if params['force_flux_bounds']:
+        force_reaction_bounds(model, params['force_flux_bounds'], condition)
+    if params['force_active_reactions']:
+        force_active_rxns(model, params['force_active_reactions'], params['fluxvalue'], condition)
 
     solver_ready = True
     if clus['force_cplex'] and not hasattr(optlang, 'cplex_interface'):

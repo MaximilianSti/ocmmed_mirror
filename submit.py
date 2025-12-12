@@ -5,17 +5,17 @@ import ruamel.yaml as yaml
 # read configuration from YAML files
 yaml_reader = yaml.YAML(typ='safe')
 
-with open('params_cluster.yaml', 'r') as file:
+with open('paramseters.yaml', 'r') as file:
     c = file.read()
-clus = yaml_reader.load(c)
+params = yaml_reader.load(c)
 
 cmdline = ["sbatch"]
 
-mem_gb = clus['memory']
-threads = clus['cores']
-runtime = clus['time']
+mem_gb = params['memory']
+threads = params['cores']
+runtime = params['time']
 
-if clus['suppress_slurmfiles']:
+if params['suppress_slurmfiles']:
     cmdline.append("--output=/dev/null --error=/dev/null")
 
 slurm_args = f" --mem {mem_gb}G -c {threads} -t {runtime}"
