@@ -5,7 +5,7 @@ import ruamel.yaml as yaml
 # read configuration from YAML files
 yaml_reader = yaml.YAML(typ='safe')
 
-with open('paramseters.yaml', 'r') as file:
+with open('parameters.yaml', 'r') as file:
     c = file.read()
 params = yaml_reader.load(c)
 
