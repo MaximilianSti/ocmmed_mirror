@@ -60,9 +60,9 @@ else:
     with open(outpath + 'reactions_shuffled.txt', 'w+') as file:
         file.write('\n'.join(reactions))
 
-if params['blocked_reactions']:
-    if not Path(params['blocked_reactions']).exists():
-        raise FileNotFoundError('Blocked reaction file not found, check if you provided the correct path: %s' % params['blocked_reactions'])
+if params['blocked_rxns']:
+    if not Path(params['blocked_rxns']).exists():
+        raise FileNotFoundError('Blocked reaction file not found, check if you provided the correct path: %s' % params['blocked_rxns'])
 
 def get_batchnum():
     batchnum = (len(reactions) // params['batch_rxn_sols']) + 1

@@ -29,9 +29,9 @@ rule div_enum:
         cluspath+'div_enum_stats_{condition}_{parallel}.csv',
         cluspath+'div_enum_solutions_{condition}_{parallel}.csv'
     params: 
-        dist_anneal = lambda w: (1 - 1 / (clus['batch_num'] * 2 * (clus['batch_div_sols'] / 10))) ** int(w.parallel)
+        dist_anneal = lambda w: (1 - 1 / (params'batch_num'] * 2 * (params'batch_div_sols'] / 10))) ** int(w.parallel)
     shell:
-        'python utilities_cluster/cluster_div_enum.py -c "{wildcards.condition}" -p {wildcards.parallel} -d {params.dist_anneal} -i '+str(clus['batch_div_sols'])
+        'python utilities_cluster/cluster_div_enum.py -c "{wildcards.condition}" -p {wildcards.parallel} -d {params.dist_anneal} -i '+str(params'batch_div_sols'])
 
 rule concat_rxn_sols:
     input:
@@ -48,7 +48,7 @@ rule rxn_enum:
     output:
         cluspath+'rxn_enum_solutions_{condition}_{parallel}.csv'
     params: 
-        rxn_range = lambda w: str(clus['batch_rxn_sols']*int(w.parallel)) + '_' + str(clus['batch_rxn_sols']*(int(w.parallel)+1))
+        rxn_range = lambda w: str(params'batch_rxn_sols']*int(w.parallel)) + '_' + str(params'batch_rxn_sols']*(int(w.parallel)+1))
     shell:
         'python utilities_cluster/cluster_rxn_enum.py -c "{wildcards.condition}" -p {wildcards.parallel} -r {params.rxn_range}'
 
@@ -68,7 +68,7 @@ rule full_rxn_enum:
     output:
         cluspath+ 'rxn_enum_full_solutions_{condition}_{batchnum}.csv'
     params:
-        rxn_range = lambda w: str(clus['batch_rxn_sols']*int(w.batchnum)) + '_' + str(clus['batch_rxn_sols']*(int(w.batchnum)+1))
+        rxn_range = lambda w: str(params'batch_rxn_sols']*int(w.batchnum)) + '_' + str(params'batch_rxn_sols']*(int(w.batchnum)+1))
     shell:
         'python utilities_cluster/cluster_rxn_enum.py -c "{wildcards.condition}" -p {wildcards.batchnum} -r {params.rxn_range}'
 
