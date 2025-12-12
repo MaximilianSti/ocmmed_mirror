@@ -66,7 +66,7 @@ if __name__ == '__main__':
         force_active_rxns(model, params['force_active_reactions'], params['fluxvalue'], condition)
 
     solver_ready = True
-    if clus['force_cplex'] and not hasattr(optlang, 'cplex_interface'):
+    if params['force_cplex'] and not hasattr(optlang, 'cplex_interface'):
         solver_ready = False
 
     if solver_ready:
