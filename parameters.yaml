@@ -6,6 +6,8 @@ modelpath: testdata/iJO1366.xml
 
 expressionfile: testdata/iJO1366_genedata.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
+# accepted delimiters: comma (,), semicolon (;), tab (\t)
+# your gene IDs cannot contain special characters such as ; or ,
 
 output_path: testdata_results
 # path to a folder in which the output files will be saved. If the folder does not exist, it will be created
@@ -38,17 +40,17 @@ gpr_percentile: 0.1
   # example: with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
 
 
-### these parameters are for additional constraints on the metabolic model
+### these parameters are for additional constraints on the metabolic model (optional)
 
 force_flux_bounds: testdata/iJO1366_bounds.csv
-#  BIOMASS_reaction: 1e-2,1000
 # manually define the lower and upper flux bounds for some reactions
-# this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
+# this should be a text or csv file where the column headers are: reaction_ID, condition1_lb, condtion1_ub, etc...
+# and each line contains the bounds for one reaction in all conditions
 
 force_active_reactions:
 # manually define reactions that must carry flux, and their minimum flux value
 # particularly useful for reversible reactions that could carry flux in either direction
-# this can also be a text file containing reaction ids
+# this should be a text file where each line is a reaction ID
 
 fluxvalue: 1.0
 # 'fluxvalue' is the absolute value that will be used for forcing flux in 'force_active_reactions'
@@ -97,12 +99,9 @@ memory: 48
 time: 10:00:00
 # maximum allowed runtime per job in hours:minutes:seconds
 
-emails: false
-# if true, you will receive an email alert everytime a batch starts and ends
-# if false, you will only receive no email alerts
-
 force_cplex: true
 # if True, the optimizations will be run only if the cplex solver is available
+# OCMMED has not been tested with other solvers
 
 suppress_slurmfiles: true
 # when set to "true", suppresses the slurm output files in the format "slurm-[jobID].out"

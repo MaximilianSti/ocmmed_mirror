@@ -1,5 +1,4 @@
 #!/bin/bash
-#SBATCH --mail-type=ALL
 #SBATCH -J submit
 #SBATCH -o submit_out.out
 #SBATCH -e submit_err.out
