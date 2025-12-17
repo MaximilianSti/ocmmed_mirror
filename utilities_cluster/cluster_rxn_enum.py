@@ -97,7 +97,7 @@ if __name__ == '__main__':
     uniques = pd.DataFrame(rxnsol.unique_binary)
     uniques.columns = [r.id for r in model.reactions]
     prefix = 'rxn_enum_'
-    if params['rxn_enum_params']['full_rxn_enum']:
+    if params['full_rxn_enum']:
         prefix += 'full_'
     uniques.to_csv(cluspath + prefix + 'solutions_%s_%s.csv' % (condition, args.parallel_id))
     fluxes = pd.concat([s.fluxes for s in rxnsol.unique_solutions], axis=1).T.reset_index().drop('index', axis=1)

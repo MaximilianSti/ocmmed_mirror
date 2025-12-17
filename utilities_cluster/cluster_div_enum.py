@@ -48,7 +48,7 @@ if __name__ == '__main__':
     rw = dexom_python.load_reaction_weights(filename=outpath + 'reaction_weights_%s.csv' % condition)
 
     rxn_enum_prefix = 'all_rxn_enum_'
-    if params['rxn_enum_params']['full_rxn_enum']:
+    if params['full_rxn_enum']:
         rxn_enum_prefix += 'full_'
     prevsol, _ = dexom_python.enum_functions.read_prev_sol(
         outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition, model=model, rw=rw,

@@ -70,10 +70,16 @@ union_cutoff: 0
 
 ### these parameters are for the network enumeration
 
-rxn_enum_iterations: 3
-div_enum_iterations: 3
-# number of iterations for reaction-enum and diversity-enum (if using the main.py script)
-# These parameters are ignored in the cluster pipeline, see below for the slurm parameters
+batch_rxn_sols: 50
+# number of reaction-enum solutions per batch. If running on a local machine, there is only 1 batch
+
+full_rxn_enum: false
+  # if set to true, this parameter forces reaction-enum to be applied on all reactions from the model
+  # the number of batch_rxn_sols will then be ignored
+  # this will strongly increase computation times for large models, but maximizes the spread of starting points for the diversity-enum batches
+
+batch_div_sols: 10
+# number of diversity-enum solutions per batch. If running on a local machine, there is only 1 batch
 
 
 #### CLUSTER PARAMETERS #####
@@ -81,12 +87,6 @@ div_enum_iterations: 3
 
 batch_num: 2
 # number of parallel batches for each condition
-
-batch_rxn_sols: 50
-# number of reaction-enum solutions per batch
-
-batch_div_sols: 10
-# number of diversity-enum solutions per batch
 
 cores: 12
 # number of cores to assign for each job
@@ -141,10 +141,6 @@ enum_params:
   # if you are using discrete weights instead of qualitative weights, increase this parameter up to 1e-2 for faster runtimes
 
 rxn_enum_params:
-  full_rxn_enum: false
-  # if set to true, this parameter forces reaction-enum to be applied on all reactions from the model
-  # this will strongly increase computation times for large models, but maximizes the spread of starting points for the diversity-enum batches
-
   reaction_list:
   # OPTIONAL
   # providing a curated list of non-essential, non-blocked reactions in a shuffled order improves the performance of the reaction-enum method
