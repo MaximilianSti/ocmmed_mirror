@@ -1,10 +1,10 @@
 
-### these are the filepaths used in the pipeline
+### these are the main filepaths used in the pipeline
 
-modelpath: testdata/E_coli_core.xml
+modelpath: testdata/iJO1366.xml
 # must be a valid cobrapy model (either .xml, .json, or .mat)
 
-expressionfile: testdata/e_coli_fakedata.tsv
+expressionfile: testdata/iJO1366_genedata.csv
 # must be a csv file with gene identifiers in one column and gene expression data in other columns
 
 output_path: testdata_results
@@ -40,7 +40,7 @@ gpr_percentile: 0.1
 
 ### these parameters are for additional constraints on the metabolic model
 
-force_flux_bounds: testdata/e_coli_bounds.csv
+force_flux_bounds: testdata/iJO1366_bounds.csv
 #  BIOMASS_reaction: 1e-2,1000
 # manually define the lower and upper flux bounds for some reactions
 # this can also be a text file where each line contains the bounds for one reaction in this type of format: MAR09931,1,1000
