@@ -26,4 +26,8 @@ pip install snakemake
 pip install pulp==2.7.0
 pip  uninstall --yes gurobipy
 
+echo "downloading test model"
+
+python utilities_cluster/cluster_installation_helper.py
+
 echo "installation complete"
