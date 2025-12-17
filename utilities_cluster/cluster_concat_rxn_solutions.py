@@ -17,12 +17,7 @@ if params['output_path']:
 else:
     outpath = ''
 
-if params['cluster_files']:
-    cluspath = params['cluster_files']
-    if cluspath[-1] not in ['/', '\\']:
-        cluspath += '/'
-else:
-    cluspath = outpath
+cluspath = outpath[:-1] + 'clusterfiles/'
 
 expressionfile = params['expressionfile']
 

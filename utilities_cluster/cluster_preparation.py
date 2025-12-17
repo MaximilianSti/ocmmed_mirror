@@ -19,13 +19,8 @@ if __name__ == '__main__':
     else:
         outpath = ''
 
-    if params['cluster_files']:
-        cluspath = params['cluster_files']
-        os.makedirs(cluspath, exist_ok=True)
-        if cluspath[-1] not in ['/', '\\']:
-            cluspath += '/'
-    else:
-        cluspath = outpath
+    cluspath = outpath[:-1] + 'clusterfiles/'
+    os.makedirs(cluspath, exist_ok=True)
 
 
     if not params['rxn_enum_params']['reaction_list']:

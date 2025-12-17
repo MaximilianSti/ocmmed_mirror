@@ -79,11 +79,6 @@ div_enum_iterations: 3
 #### CLUSTER PARAMETERS #####
 
 
-cluster_files: testdata_clusterfiles
-# path to a folder where various files will be saved for the cluster computation
-# if the folder does not exist, it will be created
-# recommendation: use 2 different folders for cluster_files and output_path
-
 batch_num: 2
 # number of parallel batches for each condition
 
