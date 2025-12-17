@@ -56,11 +56,12 @@ if __name__ == '__main__':
         rxn_sols.reset_index(inplace=True, drop=True)
         rxn_fluxes.reset_index(inplace=True, drop=True)
 
-        clustering = KMeans(n_clusters=params['batch_num']).fit(rxn_sols)  # form batch_num kmeans clusters
+        nclusters = min(params['batch_num'], len(rxn_sols)) # form batch_num kmeans clusters if there are enough solutions
+        clustering = KMeans(n_clusters=nclusters).fit(rxn_sols)
         clusterdf = pd.DataFrame(clustering.transform(rxn_sols))
-        sol_index = clusterdf.idxmin().values.tolist()  # we take the solution closest to each cluster center
-        first_pos = list(set(range(10)) - set(sol_index))
-        sol_index = list(set(sol_index) - set(range(10)))
+        sol_index = clusterdf.idxmin().values.tolist()  # take the solution closest to each cluster center
+        first_pos = list(set(range(nclusters)) - set(sol_index))
+        sol_index = list(set(sol_index) - set(range(nclusters)))
         rename_dic = {}
         for i, j in zip(first_pos, sol_index):
             rename_dic[i] = j
