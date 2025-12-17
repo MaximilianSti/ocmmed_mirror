@@ -54,8 +54,12 @@ if params['rxn_enum_params']['reaction_list']:
     df = pd.read_csv(params['rxn_enum_params']['reaction_list'], header=None)
     reactionlen = len([x for x in df.unstack().values])
 else:
-    model = dp.read_model(params['modelpath'])
-    reactionlen = len(model.reactions)
+     if Path(outpath + 'reactions_shuffled.txt').exists():
+        with open(outpath + 'reactions_shuffled.txt', 'r') as file:
+            reactionlen = len(file.readlines())
+    else:
+        model = dp.read_model(params['modelpath'])
+        reactionlen = len(model.reactions)
 
 def get_batchnum():
     batchnum = (reactionlen // params['batch_rxn_sols']) + 1
