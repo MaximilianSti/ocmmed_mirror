@@ -56,6 +56,9 @@ if __name__ == '__main__':
         rxn_sols.reset_index(inplace=True, drop=True)
         rxn_fluxes.reset_index(inplace=True, drop=True)
 
+        rxn_sols.to_csv(cluspath + 'all_' + prefix + 'solutions_%s_not_reoredered.csv' % condition)
+        rxn_fluxes.to_csv(cluspath + 'all_' + prefix + 'fluxes_%s_not_reoredered.csv' % condition)
+
         nclusters = min(params['batch_num'], len(rxn_sols)) # form batch_num kmeans clusters if there are enough solutions
         clustering = KMeans(n_clusters=nclusters).fit(rxn_sols)
         clusterdf = pd.DataFrame(clustering.transform(rxn_sols))
