@@ -113,7 +113,7 @@ suppress_slurmfiles: true
 # but if an error occurs the error message won't appear in the logs.
 
 
-#### ADDITIONAL PARAMETERS FOR ADVANCES USERS ####
+#### ADDITIONAL PARAMETERS FOR ADVANCED USERS ####
 
 
 ### This file contains parameters which can be modified if needed
