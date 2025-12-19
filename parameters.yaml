@@ -35,9 +35,13 @@ gpr_qualitative: true
   # if true, the gene expression will be converted to reaction weights -1/0/1
   # if false, the expression will directly be mapped to the reactions
 
-gpr_percentile: 0.1
-  # the percentile cutoff for low/high gene expression (this is only used if qualitative: true)
-  # example: with 0.25, the genes with the lowest 25% expression are converted to -1, and the highest 25% expression to 1
+gpr_high_cutoff: 0.75
+  # the percentile cutoff for high gene expression (this is only used if qualitative: true)
+  # example: with 0.75, the genes above the 75th percentile are converted to 1
+
+gpr_low_cutoff: 0.25
+  # the percentile cutoff for low gene expression (this is only used if qualitative: true)
+  # example: with 0.25, the genes below the 25th percentile are converted to -1
 
 
 ### these parameters are for additional constraints on the metabolic model (optional)
@@ -72,7 +76,7 @@ union_cutoff: 0
 
 ### these parameters are for the network enumeration
 
-batch_rxn_sols: 50
+batch_rxn_sols: 20
 # number of reaction-enum solutions per batch. If running on a local machine, there is only 1 batch
 
 full_rxn_enum: false

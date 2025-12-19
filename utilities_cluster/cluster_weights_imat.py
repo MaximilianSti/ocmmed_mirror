@@ -40,7 +40,8 @@ if __name__ == '__main__':
     genes = genes.loc[genes.index.dropna()]
     if params['gpr_qualitative'] and not params['reaction_scores']:
         genes = dexom_python.expression2qualitative(genes=genes, column_list=[condition],
-                                                    proportion=params['gpr_percentile'],
+                                                    proportion=(params['gpr_low_cutoff'], params['gpr_high_cutoff']),
+                                                    significant_genes='both', save=True,
                                                     outpath=outpath+'geneweights_qualitative_%s' % condition)
     # create reaction weights from gene expression
     model = model_keep.copy()
