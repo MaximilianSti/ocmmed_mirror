@@ -58,6 +58,11 @@ if __name__ == '__main__':
         rw = dexom_python.apply_gpr(model=model, gene_weights=gene_weights, duplicates=params['duplicates'], save=True,
                                     filename=outpath+'reaction_weights_%s' % condition)
 
+    if min(rw.values())  == 0. and max(rw.values()) == 0.:
+        with open(outpath + 'ERROR_EMPTY_REACTIONWEIGHTS_%s.txt' % condition, 'w+') as file:
+            file.write('reaction-weights contain only zeros, check GPR rules and expression data')
+        raise KeyError('reaction-weights contain only zeros, check GPR rules and expression data')
+
     # compute imat solution from reaction weights
 
     print('performing iMAT for condition ' + condition)
