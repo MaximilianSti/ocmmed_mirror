@@ -1,36 +1,16 @@
-import ruamel.yaml as yaml
 import pandas as pd
 import os
 
-yaml_reader = yaml.YAML(typ='safe')
-with open('parameters.yaml', 'r') as file:
-    a = file.read()
-doc = yaml_reader.load(a)
-if doc['output_path']:
-    outpath = doc['output_path']
-    if outpath[-1] not in ['/', '\\']:
-        outpath += '/'
-else:
-    outpath = ''
 
-
-def compute_differentially_activated_reactions(input_folder=None, control=None, r2_threshold=0.2):
+def compute_differentially_activated_reactions(inputpath, conditions, control=None, r2_threshold=0.2):
     """
     Computes Differentially Activated Reactions, as defined in https://doi.org/10.1186/s12859-024-05845-z
     A control condition can be used as a reference for computing DARs. Defaults to None, in which case all pairwise comparisons are performed.
     """
-    if doc['gene_expression_columns']:
-        conditions = [x.strip() for x in doc['gene_expression_columns'].split(',')]
-    else:
-        genes = pd.read_csv(doc['expressionfile'], sep=';|,|\t', engine='python').set_index(doc['gene_ID_column'])
-        conditions = genes.columns.to_list()
     if control is None:
-        # control = conditions[0]
         print('No control condition specified, all pairwise comparisons will be performed.')
     elif control not in conditions:
         raise ValueError('No condition named %s in condition list' % control)
-    if input_folder is None:
-        inputpath = outpath
     dataframes = {}
     for c in conditions:
         path = inputpath + 'all_DEXOM_solutions_%s.csv' % c
@@ -38,7 +18,7 @@ def compute_differentially_activated_reactions(input_folder=None, control=None, 
         dataframes[c] = df
     darnumbers = pd.DataFrame(index=conditions, columns=conditions, dtype=int)
 
-    outpath_DAR = outpath + 'DAR_analysis/'
+    outpath_DAR = inputpath + 'DAR_analysis/'
     os.makedirs(outpath_DAR, exist_ok=True)
     if control is None:
         for c1 in conditions:

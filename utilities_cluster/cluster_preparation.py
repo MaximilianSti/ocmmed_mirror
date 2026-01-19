@@ -29,6 +29,10 @@ if __name__ == '__main__':
         reactions = [r.id for r in model.reactions]
 
         blocked_rxns = find_blocked_reactions(model)
+
+        with open(outpath + 'blocked_reactions.txt', 'w+') as file:
+            file.write('\n'.join(blocked_rxns))
+
         essential_rxns = find_essential_reactions(model)
 
         reactions = list(set(reactions) - set(blocked_rxns) - set(essential_rxns))

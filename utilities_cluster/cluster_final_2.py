@@ -58,5 +58,13 @@ if __name__ == '__main__':
         raise ValueError('Invalid value for "final_network" in parameters.yaml.')
     model.id += '_cellspecific'
     write_sbml_model(model, outpath+'cellspecific_model.xml')
-    compute_inactive_pathways(model)
-    compute_differentially_activated_reactions()
+
+    fullmodel = dexom_python.read_model(params['modelpath'], solver='cplex')
+    compute_inactive_pathways(model=model, fullmodel=fullmodel, outpath=outpath, blocked_rxns=params['blocked_rxns'])
+
+    if params['gene_expression_columns']:
+        conditions = [x.strip() for x in params['gene_expression_columns'].split(',')]
+    else:
+        genes = pd.read_csv(params['expressionfile'], sep=';|,|\t', engine='python').set_index(params['gene_ID_column'])
+        conditions = genes.columns.to_list()
+    compute_differentially_activated_reactions(inputpath=outpath, conditions=conditions)
