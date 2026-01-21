@@ -157,9 +157,9 @@ div_enum_params:
   # if true, will apply integer-cut constraints. This will prevent diversity-enum from finding duplicate solutions
   full: false
   # if true, will use the full-DEXOM implementation (see dexom-python documentation).
-  # This very significantly increases the computation time per iteration and should only be done on small models
+  # This very significantly increases the computation time per iteration and should only be done on small models (<<1000 reactions)
 
 blocked_rxns:
 # OPTIONAL
-# provide a list of reactions which are blocked in the model.
+# provide a file containing a list of reactions which are blocked in the model.
 # This will be used for determining which reactions are inactive in the cell-specific model
