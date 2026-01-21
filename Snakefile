@@ -29,9 +29,10 @@ rule div_enum:
         cluspath+'div_enum_stats_{condition}_{parallel}.csv',
         cluspath+'div_enum_solutions_{condition}_{parallel}.csv'
     params: 
-        dist_anneal = lambda w: (1 - 1 / (params['batch_num'] * 2 * (params['batch_div_sols'] / 10))) ** int(w.parallel)
+        dist_anneal = lambda w: (1 - 1 / (params['batch_num'] * 2 * (params['batch_div_sols'] / 10))) ** int(w.parallel),
+        batch_div_sols = params['batch_div_sols']
     shell:
-        'python utilities_cluster/cluster_div_enum.py -c "{wildcards.condition}" -p {wildcards.parallel} -d {params.dist_anneal} -i '+str(params['batch_div_sols'])
+        'python utilities_cluster/cluster_div_enum.py -c "{wildcards.condition}" -p {wildcards.parallel} -d {params.dist_anneal} -i {params.batch_div_sols}'
 
 rule concat_rxn_sols:
     input:
