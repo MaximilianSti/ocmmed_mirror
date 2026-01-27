@@ -17,7 +17,7 @@ if params['output_path']:
 else:
     outpath = ''
 
-cluspath = outpath[:-1] + 'clusterfiles/'
+cluspath = outpath[:-1] + '_clusterfiles/'
 
 expressionfile = params['expressionfile']
 
@@ -31,7 +31,6 @@ if __name__ == '__main__':
     if params['full_rxn_enum']:
         prefix += 'full_'
 
-
     genes = pd.read_csv(expressionfile, sep=';|,|\t', engine='python').set_index(params['gene_ID_column'])
     genes = genes.loc[genes.index.dropna()]
     if params['gene_expression_columns']:
@@ -44,7 +43,7 @@ if __name__ == '__main__':
         for f in solfiles:
             sol = pd.read_csv(f, index_col=0)
             solutions.append(sol)
-        rxn_sols = pd.concat(solutions, ignore_index=True).drop_duplicates()
+        rxn_sols = pd.concat(solutions, ignore_index=True).drop_duplicates().sample(frac=1)
 
         fluxes = []
         fluxfiles = Path(cluspath).glob(prefix + 'fluxes_%s_*.csv' % condition)

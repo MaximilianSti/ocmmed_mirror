@@ -17,7 +17,7 @@ if params['output_path']:
 else:
     outpath = ''
 
-cluspath = outpath[:-1] + 'clusterfiles/'
+cluspath = outpath[:-1] + '_clusterfiles/'
 
 # check if modelpath exists
 if not Path(params['modelpath']).exists():

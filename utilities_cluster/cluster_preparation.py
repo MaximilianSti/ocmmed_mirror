@@ -20,7 +20,7 @@ if __name__ == '__main__':
     else:
         outpath = ''
 
-    cluspath = outpath[:-1] + 'clusterfiles/'
+    cluspath = outpath[:-1] + '_clusterfiles/'
     os.makedirs(cluspath, exist_ok=True)
 
 

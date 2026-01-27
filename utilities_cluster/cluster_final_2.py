@@ -22,7 +22,7 @@ if params['output_path']:
 else:
     outpath = ''
 
-cluspath = outpath[:-1] + 'clusterfiles/'
+cluspath = outpath[:-1] + '_clusterfiles/'
 
 expressionfile = params['expressionfile']
 cobra_config = Configuration()

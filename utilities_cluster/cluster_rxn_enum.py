@@ -19,7 +19,7 @@ if params['output_path']:
 else:
     outpath = ''
 
-cluspath = outpath[:-1] + 'clusterfiles/'
+cluspath = outpath[:-1] + '_clusterfiles/'
 
 mp = params['model_params']
 ip = params['imat_params']

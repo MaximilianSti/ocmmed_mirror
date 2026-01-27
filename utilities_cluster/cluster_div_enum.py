@@ -5,6 +5,7 @@ from utilities.force import force_active_rxns, force_reaction_bounds
 import argparse
 from warnings import warn
 import optlang
+from pathlib import Path
 
 yaml_reader = yaml.YAML(typ='safe')
 with open('parameters.yaml', 'r') as file:
@@ -18,7 +19,7 @@ if params['output_path']:
 else:
     outpath = ''
 
-cluspath = outpath[:-1] + 'clusterfiles/'
+cluspath = outpath[:-1] + '_clusterfiles/'
 
 mp = params['model_params']
 ip = params['imat_params']
@@ -50,6 +51,15 @@ if __name__ == '__main__':
     rxn_enum_prefix = 'all_rxn_enum_'
     if params['full_rxn_enum']:
         rxn_enum_prefix += 'full_'
+
+    solpath = Path(outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition)
+    if not solpath.is_file():
+        warn('Kmeans clustering failed, starting points for diversity-enum will not be optimal')
+        solpath = Path(outpath + rxn_enum_prefix + 'fluxes_%s_not_reaordered.csv' % condition)
+
+        if not solpath.is_file():
+            raise FileNotFoundError('No reaction-enumeration flux file found for condition %s' % condition)
+
     prevsol, _ = dexom_python.enum_functions.read_prev_sol(
         outpath + rxn_enum_prefix + 'fluxes_%s.csv' % condition, model=model, rw=rw,
         eps=ip['epsilon'], thr=ip['threshold'], startsol=int(args.parallel_id))
